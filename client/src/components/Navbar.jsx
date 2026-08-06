@@ -1,12 +1,13 @@
 // client/src/components/Navbar.jsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, Shield } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { LogOut, Shield, Menu, X } from 'lucide-react';
+import { Link, useNavigate, NavLink } from 'react-router-dom';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -26,25 +27,45 @@ export default function Navbar() {
     }
   };
 
+  const links = [
+    { title: 'Dashboard', path: '/dashboard', roles: ['ADMIN', 'RECEPTIONIST', 'EMPLOYEE'] },
+    { title: 'Register Visitor', path: '/register-visitor', roles: ['RECEPTIONIST', 'ADMIN'] },
+    { title: 'Visitor Log Master', path: '/visitors', roles: ['ADMIN', 'RECEPTIONIST'] },
+    { title: 'Visitor Approvals', path: '/requests', roles: ['EMPLOYEE'] },
+    { title: 'Manage Staff', path: '/employees', roles: ['ADMIN'] },
+    { title: 'Visitor Reports', path: '/reports', roles: ['ADMIN'] },
+  ];
+
+  const userLinks = user ? links.filter(l => l.roles.includes(user.role)) : [];
+
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-slate-200 px-6 py-3.5 flex items-center justify-between shadow-xs">
-      <div className="flex items-center gap-3">
+    <header className="sticky top-0 z-40 bg-white border-b border-slate-200 px-4 sm:px-6 py-3 flex flex-col sm:flex-row sm:items-center justify-between shadow-xs">
+      <div className="flex items-center justify-between">
         <Link to="/dashboard" className="flex items-center gap-3 group">
           <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-600/20 group-hover:bg-blue-700 transition-colors">
             <Shield className="w-5 h-5 text-white" />
           </div>
           <div>
             <h1 className="font-bold text-lg text-slate-900 tracking-tight flex items-center gap-2">
-              PassGuard <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200 font-semibold">Corporate</span>
+              PassGuard <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200 font-semibold">India</span>
             </h1>
-            <p className="text-xs text-slate-500 font-medium">Visitor Pass Management System</p>
+            <p className="text-xs text-slate-500 font-medium">Visitor Pass System</p>
           </div>
         </Link>
+
+        {user && (
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        )}
       </div>
 
       {user && (
-        <div className="flex items-center gap-4">
-          <div className="hidden sm:flex items-center gap-3 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200">
+        <div className="hidden md:flex items-center gap-4">
+          <div className="flex items-center gap-3 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200">
             <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
               {user.name.charAt(0)}
             </div>
@@ -64,8 +85,50 @@ export default function Navbar() {
             className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-rose-600 px-3 py-2 rounded-xl hover:bg-rose-50 transition-colors border border-transparent hover:border-rose-200"
           >
             <LogOut className="w-4 h-4" />
-            <span className="hidden md:inline">Sign Out</span>
+            <span>Sign Out</span>
           </button>
+        </div>
+      )}
+
+      {/* Mobile Drawer Menu */}
+      {user && mobileMenuOpen && (
+        <div className="md:hidden mt-3 pt-3 border-t border-slate-200 space-y-3 pb-2 animate-in fade-in slide-in-from-top-2">
+          <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                {user.name.charAt(0)}
+              </div>
+              <div>
+                <p className="text-xs font-bold text-slate-900">{user.name}</p>
+                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full border ${getRoleBadge(user.role)}`}>
+                  {user.role}
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="text-xs font-bold text-rose-600 px-2.5 py-1.5 rounded-lg bg-rose-50 border border-rose-200"
+            >
+              Sign Out
+            </button>
+          </div>
+
+          <nav className="grid grid-cols-2 gap-2">
+            {userLinks.map((link) => (
+              <NavLink
+                key={link.path}
+                to={link.path}
+                onClick={() => setMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  `px-3 py-2 rounded-xl text-xs font-semibold transition ${
+                    isActive ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  }`
+                }
+              >
+                {link.title}
+              </NavLink>
+            ))}
+          </nav>
         </div>
       )}
     </header>

@@ -8,6 +8,7 @@ import {
   LogIn, 
   LogOut, 
   History,
+  Trash2,
   X
 } from 'lucide-react';
 
@@ -63,6 +64,16 @@ export default function VisitorLog() {
     }
   };
 
+  const handleDeleteVisit = async (visit) => {
+    if (!window.confirm(`Are you sure you want to permanently delete visitor pass record for '${visit.visitor?.fullName}'?`)) return;
+    try {
+      await API.delete(`/visits/${visit._id}`);
+      fetchVisits();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to delete record');
+    }
+  };
+
   const getStatusBadge = (status) => {
     switch (status) {
       case 'PENDING':
@@ -84,23 +95,23 @@ export default function VisitorLog() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Visitor Pass & Log Master</h1>
-          <p className="text-sm text-slate-500 font-medium mt-1">Search, check in, check out, and view full activity audit timelines.</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Visitor Pass & Log Master</h1>
+          <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">Search, check in, check out, delete, and view activity audit timelines.</p>
         </div>
       </div>
 
       {/* Filters & Search Toolbar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-center gap-3">
+      <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-center gap-3">
         <div className="relative flex-1 w-full">
           <Search className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by Visitor Name, Phone, Host Employee, or Badge..."
-            className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2 text-sm text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none font-medium"
+            placeholder="Search by Visitor Name, Mobile (+91), Host, or Badge..."
+            className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2 text-xs sm:text-sm text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none font-medium"
           />
         </div>
 
@@ -109,7 +120,7 @@ export default function VisitorLog() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-800 focus:bg-white focus:border-blue-600 focus:outline-none w-full sm:w-auto font-medium"
+            className="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:bg-white focus:border-blue-600 focus:outline-none w-full sm:w-auto font-medium"
           >
             <option value="">All Statuses (Excl. Cancelled)</option>
             <option value="PENDING">Pending Approval</option>
@@ -130,53 +141,53 @@ export default function VisitorLog() {
           <div className="py-12 text-center text-slate-500 font-medium">No matching visitor records found.</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-xs sm:text-sm">
               <thead className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
                 <tr>
-                  <th className="p-4">Visitor Info</th>
-                  <th className="p-4">Host Employee</th>
-                  <th className="p-4">Visit Date & Time</th>
-                  <th className="p-4">Status & Badge</th>
-                  <th className="p-4 text-right">Actions</th>
+                  <th className="p-3 sm:p-4">Visitor Info</th>
+                  <th className="p-3 sm:p-4">Host Employee</th>
+                  <th className="p-3 sm:p-4">Schedule & Times</th>
+                  <th className="p-3 sm:p-4">Status & Badge</th>
+                  <th className="p-3 sm:p-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {visits.map((v) => (
                   <tr key={v._id} className="hover:bg-slate-50 transition">
-                    <td className="p-4">
+                    <td className="p-3 sm:p-4">
                       <div className="font-bold text-slate-900">{v.visitor?.fullName || 'Unknown'}</div>
-                      <div className="text-xs text-slate-500">{v.visitor?.email} | {v.visitor?.phone}</div>
+                      <div className="text-xs text-slate-500 font-mono">{v.visitor?.phone}</div>
                       <div className="text-[11px] text-blue-600 font-semibold mt-0.5">{v.visitor?.company || 'Personal'}</div>
                     </td>
 
-                    <td className="p-4">
+                    <td className="p-3 sm:p-4">
                       <div className="font-semibold text-slate-800">{v.hostEmployee?.name || 'N/A'}</div>
                       <div className="text-xs text-slate-500">{v.hostEmployee?.department} Dept</div>
                     </td>
 
-                    <td className="p-4 font-mono text-xs text-slate-700">
+                    <td className="p-3 sm:p-4 font-mono text-xs text-slate-700">
                       <div>{v.visitDate}</div>
-                      <div className="text-slate-500">Expected: {v.expectedTime}</div>
+                      <div className="text-slate-500">Exp: {v.expectedTime}</div>
                       {v.checkInTime && <div className="text-emerald-700 font-bold text-[11px]">In: {new Date(v.checkInTime).toLocaleTimeString()}</div>}
                       {v.checkOutTime && <div className="text-slate-600 text-[11px]">Out: {new Date(v.checkOutTime).toLocaleTimeString()}</div>}
                     </td>
 
-                    <td className="p-4">
+                    <td className="p-3 sm:p-4">
                       <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${getStatusBadge(v.status)}`}>
                         {v.status}
                       </span>
                       {v.badgeNumber && (
                         <div className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
-                          Badge: {v.badgeNumber}
+                          Pass: {v.badgeNumber}
                         </div>
                       )}
                     </td>
 
-                    <td className="p-4 text-right space-x-2">
+                    <td className="p-3 sm:p-4 text-right space-x-1.5 sm:space-x-2 whitespace-nowrap">
                       {v.status === 'APPROVED' && (
                         <button
                           onClick={() => setCheckInModalVisit(v)}
-                          className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition shadow-xs inline-flex items-center gap-1"
+                          className="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition shadow-xs inline-flex items-center gap-1"
                         >
                           <LogIn className="w-3.5 h-3.5" /> Check In
                         </button>
@@ -185,7 +196,7 @@ export default function VisitorLog() {
                       {v.status === 'CHECKED_IN' && (
                         <button
                           onClick={() => handleCheckOut(v._id)}
-                          className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition shadow-xs inline-flex items-center gap-1"
+                          className="px-2.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition shadow-xs inline-flex items-center gap-1"
                         >
                           <LogOut className="w-3.5 h-3.5" /> Check Out
                         </button>
@@ -193,9 +204,16 @@ export default function VisitorLog() {
 
                       <button
                         onClick={() => setSelectedVisitId(v._id)}
-                        className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition border border-slate-200 inline-flex items-center gap-1"
+                        className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition border border-slate-200 inline-flex items-center gap-1"
                       >
                         <History className="w-3.5 h-3.5 text-blue-600" /> History
+                      </button>
+
+                      <button
+                        onClick={() => handleDeleteVisit(v)}
+                        className="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-bold transition border border-rose-200 inline-flex items-center gap-1"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 text-rose-600" /> Delete
                       </button>
                     </td>
                   </tr>
@@ -209,7 +227,7 @@ export default function VisitorLog() {
       {/* Check-in Modal */}
       {checkInModalVisit && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
-          <div className="bg-white w-full max-w-md rounded-2xl p-6 relative border border-slate-200 shadow-xl">
+          <div className="bg-white w-full max-w-md rounded-2xl p-5 sm:p-6 relative border border-slate-200 shadow-xl">
             <button
               onClick={() => setCheckInModalVisit(null)}
               className="absolute top-4 right-4 p-1 text-slate-400 hover:text-slate-700"
@@ -229,7 +247,7 @@ export default function VisitorLog() {
 
             <form onSubmit={handleCheckInSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Assign Badge / Visitor Pass Number</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Assign Visitor Pass Number / Badge</label>
                 <input
                   type="text"
                   required

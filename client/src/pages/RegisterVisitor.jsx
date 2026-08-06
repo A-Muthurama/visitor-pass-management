@@ -11,7 +11,7 @@ export default function RegisterVisitor() {
     email: '',
     phone: '',
     company: '',
-    governmentIdType: 'National ID',
+    governmentIdType: 'Aadhaar Card',
     governmentIdNumber: '',
     hostEmployeeId: '',
     purpose: '',
@@ -64,17 +64,17 @@ export default function RegisterVisitor() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
-        <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
+      <div className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs">
+        <h1 className="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-3">
           <UserPlus className="w-6 h-6 text-blue-600" />
           Register New Visitor Request
         </h1>
-        <p className="text-sm text-slate-500 font-medium mt-1">
-          Complete visitor personal & visit schedule details. Enforces Business Rules 1-5 automatically.
+        <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+          Complete visitor personal & visit schedule details (Indian Office Standard).
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6">
+      <form onSubmit={handleSubmit} className="bg-white p-4 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6">
         {error && (
           <div className="flex items-center gap-2 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold">
             <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-600" />
@@ -103,7 +103,7 @@ export default function RegisterVisitor() {
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleChange}
-                placeholder="e.g. John Doe"
+                placeholder="e.g. Ramesh Sharma"
                 className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none font-medium"
               />
             </div>
@@ -116,20 +116,20 @@ export default function RegisterVisitor() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="john@company.com"
+                placeholder="ramesh@company.in"
                 className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none font-medium"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Phone Number *</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Mobile Number (Indian Standard) *</label>
               <input
                 type="text"
                 required
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                placeholder="+1 555-0199"
+                placeholder="+91 98765 43210"
                 className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none font-medium"
               />
             </div>
@@ -141,23 +141,24 @@ export default function RegisterVisitor() {
                 name="company"
                 value={formData.company}
                 onChange={handleChange}
-                placeholder="Acme Inc."
+                placeholder="Tata Consultancy Services"
                 className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none font-medium"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Govt ID Type</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1">ID Proof Type (India)</label>
               <select
                 name="governmentIdType"
                 value={formData.governmentIdType}
                 onChange={handleChange}
                 className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none font-medium"
               >
-                <option value="National ID">National ID</option>
-                <option value="Passport">Passport</option>
+                <option value="Aadhaar Card">Aadhaar Card</option>
+                <option value="PAN Card">PAN Card</option>
                 <option value="Driving License">Driving License</option>
-                <option value="Other">Other</option>
+                <option value="Voter ID">Voter ID</option>
+                <option value="Passport">Passport</option>
               </select>
             </div>
 
@@ -168,7 +169,7 @@ export default function RegisterVisitor() {
                 name="governmentIdNumber"
                 value={formData.governmentIdNumber}
                 onChange={handleChange}
-                placeholder="e.g. ID-998822"
+                placeholder="e.g. XXXX-XXXX-1234"
                 className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none font-medium"
               />
             </div>
@@ -192,7 +193,7 @@ export default function RegisterVisitor() {
               >
                 {employees.map((emp) => (
                   <option key={emp._id} value={emp._id}>
-                    {emp.name} ({emp.department} Dept) — {emp.email}
+                    {emp.name} ({emp.department} Dept) — {emp.phone || emp.email}
                   </option>
                 ))}
               </select>
@@ -230,7 +231,7 @@ export default function RegisterVisitor() {
                 name="purpose"
                 value={formData.purpose}
                 onChange={handleChange}
-                placeholder="e.g. Official Client Meeting regarding project deliverables..."
+                placeholder="e.g. Vendor project discussion & contract signing..."
                 className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none font-medium"
               ></textarea>
             </div>

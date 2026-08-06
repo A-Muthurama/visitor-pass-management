@@ -1,7 +1,7 @@
 // client/src/pages/ManageEmployees.jsx
 import React, { useEffect, useState } from 'react';
 import API from '../services/api';
-import { Users, Plus, X, Edit2, Phone, Mail, Building, UserCheck } from 'lucide-react';
+import { Users, Plus, X, Edit2, Trash2, Phone, Mail, Building, UserCheck } from 'lucide-react';
 
 export default function ManageEmployees() {
   const [employees, setEmployees] = useState([]);
@@ -55,7 +55,7 @@ export default function ManageEmployees() {
       name: user.name || '',
       email: user.email || '',
       phone: user.phone || '',
-      password: '', // blank unless updating
+      password: '',
       role: user.role || 'EMPLOYEE',
       department: user.department || 'General',
     });
@@ -73,10 +73,8 @@ export default function ManageEmployees() {
 
     try {
       if (editingUser) {
-        // Edit User
         await API.put(`/users/${editingUser._id}`, formData);
       } else {
-        // Create User
         await API.post('/users', formData);
       }
       setModalOpen(false);
@@ -86,28 +84,29 @@ export default function ManageEmployees() {
     }
   };
 
-  const handleToggleActive = async (id) => {
+  const handleDeleteUser = async (user) => {
+    if (!window.confirm(`Are you sure you want to permanently delete staff user account '${user.name}'?`)) return;
     try {
-      await API.delete(`/users/${id}`);
+      await API.delete(`/users/${user._id}`);
       fetchEmployees();
     } catch (err) {
-      alert(err.response?.data?.message || 'Action failed');
+      alert(err.response?.data?.message || 'Delete failed');
     }
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-3">
             <Users className="w-6 h-6 text-purple-600" />
             Manage Staff Accounts & System Roles
           </h1>
-          <p className="text-sm text-slate-500 font-medium mt-1">Admin User Management for Employees, Receptionists, and Administrators.</p>
+          <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">Admin User Management for Employees, Receptionists, and Administrators.</p>
         </div>
         <button
           onClick={openCreateModal}
-          className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs shadow-md shadow-purple-600/20 transition flex items-center gap-2"
+          className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs shadow-md shadow-purple-600/20 transition flex items-center gap-2 self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" /> Add User Account
         </button>
@@ -118,26 +117,26 @@ export default function ManageEmployees() {
           <div className="py-12 text-center text-slate-500 font-medium">Loading user accounts...</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-xs sm:text-sm">
               <thead className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
                 <tr>
-                  <th className="p-4">User Details</th>
-                  <th className="p-4">Mobile / Phone</th>
-                  <th className="p-4">System Role</th>
-                  <th className="p-4">Department</th>
-                  <th className="p-4">Account Status</th>
-                  <th className="p-4 text-right">Actions</th>
+                  <th className="p-3 sm:p-4">User Details</th>
+                  <th className="p-3 sm:p-4">Mobile Number</th>
+                  <th className="p-3 sm:p-4">System Role</th>
+                  <th className="p-3 sm:p-4">Department</th>
+                  <th className="p-3 sm:p-4">Status</th>
+                  <th className="p-3 sm:p-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {employees.map((emp) => (
                   <tr key={emp._id} className="hover:bg-slate-50 transition">
-                    <td className="p-4">
+                    <td className="p-3 sm:p-4">
                       <div className="font-bold text-slate-900">{emp.name}</div>
                       <div className="text-xs text-slate-500">{emp.email}</div>
                     </td>
 
-                    <td className="p-4 text-slate-700 font-mono text-xs font-semibold">
+                    <td className="p-3 sm:p-4 text-slate-700 font-mono text-xs font-semibold">
                       {emp.phone ? (
                         <div className="flex items-center gap-1.5">
                           <Phone className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
@@ -148,7 +147,7 @@ export default function ManageEmployees() {
                       )}
                     </td>
 
-                    <td className="p-4">
+                    <td className="p-3 sm:p-4">
                       <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${
                         emp.role === 'ADMIN' ? 'bg-purple-50 text-purple-700 border-purple-200' :
                         emp.role === 'RECEPTIONIST' ? 'bg-blue-50 text-blue-700 border-blue-200' :
@@ -158,35 +157,31 @@ export default function ManageEmployees() {
                       </span>
                     </td>
 
-                    <td className="p-4 text-slate-700 text-xs font-semibold">
+                    <td className="p-3 sm:p-4 text-slate-700 text-xs font-semibold">
                       {emp.department}
                     </td>
 
-                    <td className="p-4">
-                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+                    <td className="p-3 sm:p-4">
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
                         emp.isActive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'
                       }`}>
                         {emp.isActive ? 'Active' : 'Deactivated'}
                       </span>
                     </td>
 
-                    <td className="p-4 text-right space-x-2">
+                    <td className="p-3 sm:p-4 text-right space-x-1.5 sm:space-x-2 whitespace-nowrap">
                       <button
                         onClick={() => openEditModal(emp)}
-                        className="px-3 py-1.5 rounded-lg text-xs font-bold transition border bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200 inline-flex items-center gap-1"
+                        className="px-2.5 py-1.5 rounded-lg text-xs font-bold transition border bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200 inline-flex items-center gap-1"
                       >
                         <Edit2 className="w-3.5 h-3.5 text-blue-600" /> Edit
                       </button>
 
                       <button
-                        onClick={() => handleToggleActive(emp._id)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition border ${
-                          emp.isActive 
-                            ? 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100' 
-                            : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
-                        }`}
+                        onClick={() => handleDeleteUser(emp)}
+                        className="px-2.5 py-1.5 rounded-lg text-xs font-bold transition border bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100 inline-flex items-center gap-1"
                       >
-                        {emp.isActive ? 'Deactivate' : 'Activate'}
+                        <Trash2 className="w-3.5 h-3.5 text-rose-600" /> Delete
                       </button>
                     </td>
                   </tr>
@@ -200,7 +195,7 @@ export default function ManageEmployees() {
       {/* Add / Edit User Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
-          <div className="bg-white w-full max-w-md rounded-2xl p-6 relative border border-slate-200 shadow-xl">
+          <div className="bg-white w-full max-w-md rounded-2xl p-5 sm:p-6 relative border border-slate-200 shadow-xl">
             <button onClick={() => setModalOpen(false)} className="absolute top-4 right-4 p-1 text-slate-400 hover:text-slate-700">
               <X className="w-5 h-5" />
             </button>
@@ -219,7 +214,7 @@ export default function ManageEmployees() {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="e.g. Sarah Connor"
+                  placeholder="e.g. Rajesh Kumar"
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-purple-600 focus:outline-none font-medium"
                 />
               </div>
@@ -232,27 +227,27 @@ export default function ManageEmployees() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="sarah@system.com"
+                  placeholder="rajesh@company.in"
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-purple-600 focus:outline-none font-medium"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Mobile / Phone Number *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Mobile Number (Indian Office Standard) *</label>
                 <input
                   type="text"
                   required
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder="e.g. +1 555-0102"
+                  placeholder="e.g. +91 98765 43210"
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-purple-600 focus:outline-none font-medium"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Role *</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">System Role *</label>
                   <select
                     name="role"
                     value={formData.role}
@@ -271,7 +266,7 @@ export default function ManageEmployees() {
                     name="department"
                     value={formData.department}
                     onChange={handleChange}
-                    placeholder="Engineering / HR"
+                    placeholder="IT / HR / Admin"
                     className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-purple-600 focus:outline-none font-medium"
                   />
                 </div>

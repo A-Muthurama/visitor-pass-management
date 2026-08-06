@@ -93,23 +93,20 @@ const updateUser = async (req, res) => {
   }
 };
 
-// @desc Toggle User Active Status / Delete
+// @desc Permanently Delete User Account
 // @route DELETE /api/users/:id
 // @access Admin
-const toggleUserActive = async (req, res) => {
+const deleteUserPermanently = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findByIdAndDelete(req.params.id);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    user.isActive = !user.isActive;
-    await user.save();
-
-    res.json({ message: `User ${user.isActive ? 'activated' : 'deactivated'} successfully` });
+    res.json({ message: 'User account deleted permanently' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-module.exports = { getUsers, createUser, updateUser, toggleUserActive };
+module.exports = { getUsers, createUser, updateUser, deleteUserPermanently };

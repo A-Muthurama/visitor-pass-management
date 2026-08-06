@@ -42,11 +42,10 @@ const createVisit = async (req, res) => {
         email,
         phone,
         company: company || 'N/A',
-        governmentIdType: governmentIdType || 'National ID',
+        governmentIdType: governmentIdType || 'Aadhaar Card',
         governmentIdNumber: governmentIdNumber || '',
       });
     } else {
-      // Update details if provided
       visitor.fullName = fullName || visitor.fullName;
       visitor.phone = phone || visitor.phone;
       if (company) visitor.company = company;
@@ -98,12 +97,10 @@ const getVisits = async (req, res) => {
     const { status, date, search, startDate, endDate } = req.query;
     let query = {};
 
-    // Role-based Scoping
     if (req.user.role === 'EMPLOYEE') {
       query.hostEmployee = req.user._id;
     }
 
-    // Rule 10: Cancelled visits should not appear in active visitor lists unless explicitly filtered by status
     if (!status) {
       query.status = { $ne: 'CANCELLED' };
     } else {
@@ -122,7 +119,6 @@ const getVisits = async (req, res) => {
       .populate('createdByUser', 'name role')
       .sort({ createdAt: -1 });
 
-    // Search filtering (Visitor Name, Employee Name, Purpose, Badge)
     if (search) {
       const term = search.toLowerCase();
       visits = visits.filter(v => 
@@ -140,19 +136,17 @@ const getVisits = async (req, res) => {
   }
 };
 
-// @desc Approve or Reject Visit Request
+// @desc Update Visit Status
 // @route PUT /api/visits/:id/status
-// @access Employee (Host), Admin
 const updateVisitStatus = async (req, res) => {
   try {
-    const { status, remarks } = req.body; // 'APPROVED' or 'REJECTED' or 'CANCELLED'
+    const { status, remarks } = req.body;
     const visitRequest = await VisitRequest.findById(req.params.id);
 
     if (!visitRequest) {
       return res.status(404).json({ message: 'Visit request not found' });
     }
 
-    // Check authorization: Employee must be the host, or Admin
     if (req.user.role === 'EMPLOYEE' && visitRequest.hostEmployee.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: 'Not authorized to respond to visitor requests for other employees' });
     }
@@ -180,7 +174,6 @@ const updateVisitStatus = async (req, res) => {
 
 // @desc Check-In Visitor
 // @route PUT /api/visits/:id/checkin
-// @access Receptionist, Admin
 const checkInVisitor = async (req, res) => {
   try {
     const { badgeNumber } = req.body;
@@ -190,7 +183,6 @@ const checkInVisitor = async (req, res) => {
       return res.status(404).json({ message: 'Visit request not found' });
     }
 
-    // Validate Rule 6, 7, 9
     const ruleCheck = await validateBusinessRules('CHECK_IN', { visitRequest });
     if (!ruleCheck.valid) {
       return res.status(400).json({ message: ruleCheck.message });
@@ -201,7 +193,7 @@ const checkInVisitor = async (req, res) => {
     if (badgeNumber) visitRequest.badgeNumber = badgeNumber;
     await visitRequest.save();
 
-    await createLog(visitRequest._id, 'CHECKED_IN', req.user._id, `Visitor checked in. Assigned Badge: ${badgeNumber || 'N/A'}`);
+    await createLog(visitRequest._id, 'CHECKED_IN', req.user._id, `Visitor checked in. Assigned Pass: ${badgeNumber || 'N/A'}`);
 
     const updated = await VisitRequest.findById(visitRequest._id)
       .populate('visitor')
@@ -215,7 +207,6 @@ const checkInVisitor = async (req, res) => {
 
 // @desc Check-Out Visitor
 // @route PUT /api/visits/:id/checkout
-// @access Receptionist, Admin
 const checkOutVisitor = async (req, res) => {
   try {
     const visitRequest = await VisitRequest.findById(req.params.id).populate('visitor');
@@ -225,7 +216,6 @@ const checkOutVisitor = async (req, res) => {
     }
 
     const now = new Date();
-    // Validate Rule 8
     const ruleCheck = await validateBusinessRules('CHECK_OUT', { visitRequest, checkOutTime: now });
     if (!ruleCheck.valid) {
       return res.status(400).json({ message: ruleCheck.message });
@@ -242,6 +232,41 @@ const checkOutVisitor = async (req, res) => {
       .populate('hostEmployee', 'name email department');
 
     res.json(updated);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc Delete Visitor Record
+// @route DELETE /api/visits/:id
+// @access Admin, Receptionist
+const deleteVisit = async (req, res) => {
+  try {
+    const visitRequest = await VisitRequest.findByIdAndDelete(req.params.id);
+    if (!visitRequest) {
+      return res.status(404).json({ message: 'Visit record not found' });
+    }
+
+    // Delete associated activity logs
+    await ActivityLog.deleteMany({ visitRequest: req.params.id });
+
+    res.json({ message: 'Visitor pass record deleted permanently' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc Clear All Demo Visitor & Activity Data
+// @route DELETE /api/visits/clear-all
+// @access Admin
+const clearAllData = async (req, res) => {
+  try {
+    await VisitRequest.deleteMany({});
+    await ActivityLog.deleteMany({});
+    await Visitor.deleteMany({});
+    
+    // Reset staff to base admin, receptionist, employees if needed
+    res.json({ message: 'All visitor records and history cleared successfully!' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -267,5 +292,7 @@ module.exports = {
   updateVisitStatus,
   checkInVisitor,
   checkOutVisitor,
+  deleteVisit,
+  clearAllData,
   getVisitHistory,
 };
