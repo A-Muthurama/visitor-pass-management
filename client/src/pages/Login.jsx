@@ -10,6 +10,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('ADMIN'); // 'ADMIN' | 'STAFF'
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -28,15 +29,11 @@ export default function Login() {
     }
   };
 
-  const handleQuickAdminDemo = () => {
-    setEmail('admin@control.com');
-    setPassword('Admin@321');
-  };
-
-  const handleQuickStaffDemo = () => {
+  const handleTabSwitch = (tab) => {
+    setActiveTab(tab);
     setEmail('');
     setPassword('');
-    alert('Please enter your Employee or Receptionist email and password created by your System Admin.');
+    setError('');
   };
 
   return (
@@ -55,24 +52,32 @@ export default function Login() {
 
         <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-xl shadow-slate-200/60 space-y-5">
           
-          {/* Two Login Buttons: Admin & Staff */}
-          <div className="grid grid-cols-2 gap-3">
+          {/* Secure Role Portal Selector Tabs */}
+          <div className="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-2xl">
             <button
               type="button"
-              onClick={handleQuickAdminDemo}
-              className="py-2.5 px-4 rounded-xl font-bold text-xs bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 transition flex items-center justify-center gap-2 shadow-2xs"
+              onClick={() => handleTabSwitch('ADMIN')}
+              className={`py-2.5 px-3 rounded-xl font-bold text-xs transition flex items-center justify-center gap-2 ${
+                activeTab === 'ADMIN'
+                  ? 'bg-white text-purple-700 shadow-xs'
+                  : 'text-slate-500 hover:text-slate-900'
+              }`}
             >
               <UserCheck className="w-4 h-4 text-purple-600" />
-              <span>Admin Login</span>
+              <span>Admin Portal</span>
             </button>
 
             <button
               type="button"
-              onClick={handleQuickStaffDemo}
-              className="py-2.5 px-4 rounded-xl font-bold text-xs bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition flex items-center justify-center gap-2 shadow-2xs"
+              onClick={() => handleTabSwitch('STAFF')}
+              className={`py-2.5 px-3 rounded-xl font-bold text-xs transition flex items-center justify-center gap-2 ${
+                activeTab === 'STAFF'
+                  ? 'bg-white text-blue-700 shadow-xs'
+                  : 'text-slate-500 hover:text-slate-900'
+              }`}
             >
               <Users className="w-4 h-4 text-blue-600" />
-              <span>Staff Login</span>
+              <span>Staff Portal</span>
             </button>
           </div>
 
@@ -86,7 +91,7 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Work Email Address
+                {activeTab === 'ADMIN' ? 'Administrator Email' : 'Staff Work Email'}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" />
@@ -95,7 +100,7 @@ export default function Login() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter email address"
+                  placeholder={activeTab === 'ADMIN' ? 'admin@control.com' : 'e.g. employee@company.com'}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white transition-all font-semibold"
                 />
               </div>
@@ -112,7 +117,7 @@ export default function Login() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter password"
+                  placeholder="Enter your password"
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-11 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white transition-all font-semibold"
                 />
                 <button
@@ -130,7 +135,7 @@ export default function Login() {
               disabled={loading}
               className="w-full mt-2 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md shadow-blue-600/20 transition-all flex items-center justify-center gap-2 group disabled:opacity-50"
             >
-              {loading ? 'Authenticating...' : 'Sign In to Portal'}
+              {loading ? 'Authenticating...' : `Sign In to ${activeTab === 'ADMIN' ? 'Admin' : 'Staff'} Portal`}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
           </form>
