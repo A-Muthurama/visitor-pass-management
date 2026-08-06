@@ -10,7 +10,9 @@ import {
   FileBarChart, 
   CheckSquare,
   ShieldCheck,
-  LogOut
+  LogOut,
+  Clock,
+  Building2
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -105,13 +107,14 @@ export default function Sidebar() {
           <span>Sign Out Portal</span>
         </button>
 
-        <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-          <div className="flex items-center gap-2 text-blue-700 text-xs font-bold mb-1">
-            <ShieldCheck className="w-4 h-4" />
-            Enterprise Compliance
+        {/* Relevant Office Reception Support Card */}
+        <div className="p-3.5 bg-blue-50/60 rounded-xl border border-blue-200">
+          <div className="flex items-center gap-2 text-blue-800 text-xs font-bold mb-1">
+            <Building2 className="w-4 h-4 text-blue-600" />
+            Front Desk Support
           </div>
-          <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
-            Automated Rule Engine active (Rules 1-10 validated on all check-ins & approvals).
+          <p className="text-[11px] text-slate-600 leading-relaxed font-medium">
+            Visitor check-in hours: <strong className="text-slate-800">9:00 AM - 6:00 PM</strong>. Need help? Contact Front Desk Reception.
           </p>
         </div>
       </div>
