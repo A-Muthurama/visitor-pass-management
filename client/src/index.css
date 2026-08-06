@@ -2,7 +2,7 @@
 
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 antialiased font-sans min-h-screen selection:bg-blue-600 selection:text-white;
+    @apply bg-slate-100 text-slate-900 antialiased font-sans min-h-screen selection:bg-blue-600 selection:text-white;
   }
 }
 
@@ -13,7 +13,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #e2e8f0;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -28,7 +28,7 @@
 .glass-card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
 }
 
 .glass-nav {

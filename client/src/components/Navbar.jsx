@@ -1,7 +1,7 @@
 // client/src/components/Navbar.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, Shield, Menu, X } from 'lucide-react';
+import { LogOut, Menu, X } from 'lucide-react';
 import { Link, useNavigate, NavLink } from 'react-router-dom';
 
 export default function Navbar() {
@@ -42,14 +42,14 @@ export default function Navbar() {
     <header className="sticky top-0 z-40 bg-white border-b border-slate-200 px-4 sm:px-6 py-3 flex flex-col sm:flex-row sm:items-center justify-between shadow-xs">
       <div className="flex items-center justify-between">
         <Link to="/dashboard" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-600/20 group-hover:bg-blue-700 transition-colors">
-            <Shield className="w-5 h-5 text-white" />
+          <div className="w-10 h-10 rounded-xl bg-blue-600 p-2 flex items-center justify-center shadow-md shadow-blue-600/20 group-hover:bg-blue-700 transition-colors">
+            <img src="/visitor.png" alt="PassGuard" className="w-full h-full object-contain brightness-0 invert" />
           </div>
           <div>
             <h1 className="font-bold text-lg text-slate-900 tracking-tight flex items-center gap-2">
-              PassGuard <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200 font-semibold">India</span>
+              PassGuard
             </h1>
-            <p className="text-xs text-slate-500 font-medium">Visitor Pass System</p>
+            <p className="text-xs text-slate-500 font-medium">Visitor Pass Management System</p>
           </div>
         </Link>
 
@@ -65,7 +65,15 @@ export default function Navbar() {
 
       {user && (
         <div className="hidden md:flex items-center gap-4">
-          <div className="flex items-center gap-3 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 text-sm font-bold text-rose-600 hover:text-rose-700 px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 transition-colors border border-rose-200 shadow-2xs"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Sign Out</span>
+          </button>
+
+          <div className="flex items-center gap-3 px-3.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200">
             <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
               {user.name.charAt(0)}
             </div>
@@ -79,14 +87,6 @@ export default function Navbar() {
               </div>
             </div>
           </div>
-
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-rose-600 px-3 py-2 rounded-xl hover:bg-rose-50 transition-colors border border-transparent hover:border-rose-200"
-          >
-            <LogOut className="w-4 h-4" />
-            <span>Sign Out</span>
-          </button>
         </div>
       )}
 
@@ -107,9 +107,9 @@ export default function Navbar() {
             </div>
             <button
               onClick={handleLogout}
-              className="text-xs font-bold text-rose-600 px-2.5 py-1.5 rounded-lg bg-rose-50 border border-rose-200"
+              className="text-xs font-bold text-rose-600 px-3 py-1.5 rounded-lg bg-rose-50 border border-rose-200 hover:bg-rose-100 flex items-center gap-1"
             >
-              Sign Out
+              <LogOut className="w-3.5 h-3.5" /> Sign Out
             </button>
           </div>
 

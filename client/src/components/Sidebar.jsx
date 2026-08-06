@@ -1,6 +1,6 @@
 // client/src/components/Sidebar.jsx
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
   LayoutDashboard, 
@@ -9,14 +9,21 @@ import {
   ClipboardList, 
   FileBarChart, 
   CheckSquare,
-  ShieldCheck
+  ShieldCheck,
+  LogOut
 } from 'lucide-react';
 
 export default function Sidebar() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   if (!user) return null;
 
   const role = user.role;
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const links = [
     {
@@ -88,14 +95,25 @@ export default function Sidebar() {
         </nav>
       </div>
 
-      <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-        <div className="flex items-center gap-2 text-blue-700 text-xs font-bold mb-1">
-          <ShieldCheck className="w-4 h-4" />
-          Enterprise Compliance
+      <div className="space-y-3">
+        {/* Sidebar Sign Out Button */}
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs border border-rose-200 transition shadow-2xs"
+        >
+          <LogOut className="w-4 h-4 text-rose-600" />
+          <span>Sign Out Portal</span>
+        </button>
+
+        <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+          <div className="flex items-center gap-2 text-blue-700 text-xs font-bold mb-1">
+            <ShieldCheck className="w-4 h-4" />
+            Enterprise Compliance
+          </div>
+          <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
+            Automated Rule Engine active (Rules 1-10 validated on all check-ins & approvals).
+          </p>
         </div>
-        <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
-          Automated Rule Engine active (Rules 1-10 validated on all check-ins & approvals).
-        </p>
       </div>
     </aside>
   );
