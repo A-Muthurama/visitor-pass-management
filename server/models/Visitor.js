@@ -25,8 +25,8 @@ const visitorSchema = new mongoose.Schema({
   },
   governmentIdType: {
     type: String,
-    enum: ['National ID', 'Passport', 'Driving License', 'Other'],
-    default: 'National ID',
+    enum: ['Aadhaar Card', 'PAN Card', 'Driving License', 'Voter ID', 'Passport', 'National ID', 'Other'],
+    default: 'Aadhaar Card',
   },
   governmentIdNumber: {
     type: String,
