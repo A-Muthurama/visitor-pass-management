@@ -5,6 +5,9 @@ import { UserPlus, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function RegisterVisitor() {
+  const todayDateStr = new Date().toISOString().split('T')[0];
+  const currentTimeStr = new Date().toTimeString().slice(0, 5);
+
   const [employees, setEmployees] = useState([]);
   const [formData, setFormData] = useState({
     fullName: '',
@@ -15,8 +18,8 @@ export default function RegisterVisitor() {
     governmentIdNumber: '',
     hostEmployeeId: '',
     purpose: '',
-    visitDate: new Date().toISOString().split('T')[0],
-    expectedTime: '10:00',
+    visitDate: todayDateStr,
+    expectedTime: currentTimeStr,
   });
 
   const [loading, setLoading] = useState(false);
@@ -47,6 +50,19 @@ export default function RegisterVisitor() {
     e.preventDefault();
     setError('');
     setSuccess('');
+
+    // Rule 3: Date bounds check
+    if (formData.visitDate < todayDateStr) {
+      setError('Rule 3 Violation: Scheduled visit date cannot be earlier than today.');
+      return;
+    }
+
+    // Rule 4: Time bounds check if date is today
+    if (formData.visitDate === todayDateStr && formData.expectedTime < currentTimeStr) {
+      setError('Rule 4 Violation: For today\'s registration, expected arrival time cannot be earlier than current time.');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -63,33 +79,33 @@ export default function RegisterVisitor() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6">
       <div className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs">
         <h1 className="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-3">
           <UserPlus className="w-6 h-6 text-blue-600" />
           Register New Visitor Request
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-          Complete visitor personal & visit schedule details (Indian Office Standard).
+          Indian Office Entry Standard — Triggers automated Business Rules validation (Rules 1-5).
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white p-4 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6">
-        {error && (
-          <div className="flex items-center gap-2 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold">
-            <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-600" />
-            <span>{error}</span>
-          </div>
-        )}
+      {error && (
+        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-semibold flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-600" />
+          <span>{error}</span>
+        </div>
+      )}
 
-        {success && (
-          <div className="flex items-center gap-2 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">
-            <CheckCircle2 className="w-5 h-5 flex-shrink-0 text-emerald-600" />
-            <span>{success}</span>
-          </div>
-        )}
+      {success && (
+        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-semibold flex items-center gap-3">
+          <CheckCircle2 className="w-5 h-5 flex-shrink-0 text-emerald-600" />
+          <span>{success}</span>
+        </div>
+      )}
 
-        {/* Section 1: Visitor Information */}
+      <form onSubmit={handleSubmit} className="bg-white p-5 sm:p-7 rounded-2xl border border-slate-200 shadow-xs space-y-6">
+        {/* Section 1: Visitor Profile */}
         <div>
           <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">
             1. Visitor Personal Information
@@ -103,7 +119,7 @@ export default function RegisterVisitor() {
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleChange}
-                placeholder="e.g. Ramesh Sharma"
+                placeholder="Ramesh Kumar"
                 className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none font-medium"
               />
             </div>
@@ -116,7 +132,7 @@ export default function RegisterVisitor() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="ramesh@company.in"
+                placeholder="ramesh@vendor.com"
                 className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none font-medium"
               />
             </div>
@@ -204,6 +220,7 @@ export default function RegisterVisitor() {
               <input
                 type="date"
                 required
+                min={todayDateStr}
                 name="visitDate"
                 value={formData.visitDate}
                 onChange={handleChange}
