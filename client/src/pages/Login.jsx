@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Shield, KeyRound, Mail, ArrowRight, AlertCircle, Eye, EyeOff, UserCheck } from 'lucide-react';
+import { Shield, KeyRound, Mail, ArrowRight, AlertCircle, Eye, EyeOff, UserCheck, Users } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -33,6 +33,12 @@ export default function Login() {
     setPassword('Admin@321');
   };
 
+  const handleQuickStaffDemo = () => {
+    setEmail('');
+    setPassword('');
+    alert('Please enter your Employee or Receptionist email and password created by your System Admin.');
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-slate-100 relative overflow-hidden">
       {/* Soft Office Glow Background */}
@@ -49,15 +55,26 @@ export default function Login() {
 
         <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-xl shadow-slate-200/60 space-y-5">
           
-          {/* Admin Login Button */}
-          <button
-            type="button"
-            onClick={handleQuickAdminDemo}
-            className="w-full py-2.5 px-4 rounded-xl font-bold text-xs bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 transition flex items-center justify-center gap-2 shadow-2xs"
-          >
-            <UserCheck className="w-4 h-4 text-purple-600" />
-            <span>Admin Login</span>
-          </button>
+          {/* Two Login Buttons: Admin & Staff */}
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={handleQuickAdminDemo}
+              className="py-2.5 px-4 rounded-xl font-bold text-xs bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 transition flex items-center justify-center gap-2 shadow-2xs"
+            >
+              <UserCheck className="w-4 h-4 text-purple-600" />
+              <span>Admin Login</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleQuickStaffDemo}
+              className="py-2.5 px-4 rounded-xl font-bold text-xs bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition flex items-center justify-center gap-2 shadow-2xs"
+            >
+              <Users className="w-4 h-4 text-blue-600" />
+              <span>Staff Login</span>
+            </button>
+          </div>
 
           {error && (
             <div className="flex items-center gap-2 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold">
