@@ -17,7 +17,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950 text-cyan-400 font-semibold">
+      <div className="min-h-screen flex items-center justify-center bg-slate-100 text-blue-600 font-semibold">
         Verifying Security Credentials...
       </div>
     );
@@ -32,11 +32,11 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100">
+    <div className="min-h-screen flex flex-col bg-slate-100 text-slate-900">
       <Navbar />
       <div className="flex flex-1">
         <Sidebar />
-        <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full overflow-y-auto">
+        <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full overflow-y-auto bg-slate-100">
           {children}
         </main>
       </div>
