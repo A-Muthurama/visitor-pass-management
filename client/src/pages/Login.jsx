@@ -49,26 +49,15 @@ export default function Login() {
 
         <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-xl shadow-slate-200/60 space-y-5">
           
-          {/* System Admin Quick Button */}
-          <div className="space-y-2">
-            <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider text-center">
-              Default System Admin Login
-            </label>
-            <button
-              type="button"
-              onClick={handleQuickAdminDemo}
-              className="w-full py-2.5 px-4 rounded-xl font-bold text-xs bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 transition flex items-center justify-center gap-2 shadow-2xs"
-            >
-              <UserCheck className="w-4 h-4 text-purple-600" />
-              <span>Click to Fill Admin (admin@control.com)</span>
-            </button>
-          </div>
-
-          <div className="relative flex py-1 items-center">
-            <div className="flex-grow border-t border-slate-100"></div>
-            <span className="flex-shrink mx-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Or Login with staff credentials</span>
-            <div className="flex-grow border-t border-slate-100"></div>
-          </div>
+          {/* Admin Login Button */}
+          <button
+            type="button"
+            onClick={handleQuickAdminDemo}
+            className="w-full py-2.5 px-4 rounded-xl font-bold text-xs bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 transition flex items-center justify-center gap-2 shadow-2xs"
+          >
+            <UserCheck className="w-4 h-4 text-purple-600" />
+            <span>Admin Login</span>
+          </button>
 
           {error && (
             <div className="flex items-center gap-2 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold">
@@ -89,7 +78,7 @@ export default function Login() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@control.com"
+                  placeholder="Enter email address"
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white transition-all font-semibold"
                 />
               </div>
@@ -106,7 +95,7 @@ export default function Login() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="Enter password"
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-11 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white transition-all font-semibold"
                 />
                 <button
