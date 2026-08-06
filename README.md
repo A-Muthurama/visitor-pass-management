@@ -143,6 +143,3 @@ npm run dev
 
 Visit `http://localhost:5173` in your browser.
 
-### Default System Admin Credentials:
-- **Email**: `admin@control.com`
-- **Password**: `Admin@321`
