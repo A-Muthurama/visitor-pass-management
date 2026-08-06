@@ -2,7 +2,10 @@
 
 @layer base {
   body {
-    @apply bg-slate-100 text-slate-900 antialiased font-sans min-h-screen selection:bg-blue-600 selection:text-white;
+    background-color: #f1f5f9 !important; /* Soft light slate background */
+    color: #0f172a !important;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    min-height: 100vh;
   }
 }
 
@@ -26,13 +29,13 @@
 }
 
 .glass-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05) !important;
 }
 
 .glass-nav {
-  background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.03) !important;
 }
