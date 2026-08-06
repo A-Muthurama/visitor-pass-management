@@ -51,15 +51,15 @@ export default function RegisterVisitor() {
     setError('');
     setSuccess('');
 
-    // Rule 3: Date bounds check
+    // Professional Date bounds check
     if (formData.visitDate < todayDateStr) {
-      setError('Rule 3 Violation: Scheduled visit date cannot be earlier than today.');
+      setError('Scheduled visit date cannot be earlier than today.');
       return;
     }
 
-    // Rule 4: Time bounds check if date is today
+    // Professional Time bounds check if date is today
     if (formData.visitDate === todayDateStr && formData.expectedTime < currentTimeStr) {
-      setError('Rule 4 Violation: For today\'s registration, expected arrival time cannot be earlier than current time.');
+      setError("For today's registration, expected arrival time cannot be earlier than current time.");
       return;
     }
 
@@ -72,7 +72,10 @@ export default function RegisterVisitor() {
         navigate('/visitors');
       }, 1500);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to register visitor');
+      // Clean backend error messages by removing "Rule X Violation: " prefixes if any
+      const rawMsg = err.response?.data?.message || 'Failed to register visitor';
+      const cleanMsg = rawMsg.replace(/^Rule \d+ Violation:\s*/i, '');
+      setError(cleanMsg);
     } finally {
       setLoading(false);
     }
@@ -86,25 +89,27 @@ export default function RegisterVisitor() {
           Register New Visitor Request
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-          Indian Office Entry Standard — Triggers automated Business Rules validation (Rules 1-5).
+          Indian Office Entry Standard — Fill visitor details & host schedule below.
         </p>
       </div>
 
-      {error && (
-        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-semibold flex items-center gap-3">
-          <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-600" />
-          <span>{error}</span>
-        </div>
-      )}
-
-      {success && (
-        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-semibold flex items-center gap-3">
-          <CheckCircle2 className="w-5 h-5 flex-shrink-0 text-emerald-600" />
-          <span>{success}</span>
-        </div>
-      )}
-
       <form onSubmit={handleSubmit} className="bg-white p-5 sm:p-7 rounded-2xl border border-slate-200 shadow-xs space-y-6">
+        
+        {/* Error Alert placed cleanly inside form directly above submit button */}
+        {error && (
+          <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-semibold flex items-center gap-3 animate-in fade-in slide-in-from-top-1">
+            <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-600" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        {success && (
+          <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-semibold flex items-center gap-3 animate-in fade-in slide-in-from-top-1">
+            <CheckCircle2 className="w-5 h-5 flex-shrink-0 text-emerald-600" />
+            <span>{success}</span>
+          </div>
+        )}
+
         {/* Section 1: Visitor Profile */}
         <div>
           <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">
@@ -260,7 +265,7 @@ export default function RegisterVisitor() {
           disabled={loading}
           className="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md shadow-blue-600/20 transition flex items-center justify-center gap-2 disabled:opacity-50"
         >
-          {loading ? 'Submitting & Validating Rules...' : 'Submit Visitor Registration Request'}
+          {loading ? 'Submitting Visitor Registration...' : 'Submit Visitor Registration Request'}
         </button>
       </form>
     </div>
