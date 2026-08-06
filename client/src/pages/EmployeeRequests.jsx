@@ -6,17 +6,15 @@ import {
   CheckSquare, 
   CheckCircle, 
   XCircle, 
-  Clock, 
   MessageSquare, 
-  History, 
-  AlertCircle 
+  History 
 } from 'lucide-react';
 
 export default function EmployeeRequests() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedVisitId, setSelectedVisitId] = useState(null);
-  const [actionModal, setActionModal] = useState(null); // { visit, action: 'APPROVED' | 'REJECTED' }
+  const [actionModal, setActionModal] = useState(null);
   const [remarks, setRemarks] = useState('');
   const [error, setError] = useState('');
 
@@ -56,39 +54,39 @@ export default function EmployeeRequests() {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'PENDING':
-        return 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+        return 'bg-amber-50 text-amber-700 border-amber-200';
       case 'APPROVED':
-        return 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
       case 'REJECTED':
-        return 'bg-rose-500/20 text-rose-300 border-rose-500/40';
+        return 'bg-rose-50 text-rose-700 border-rose-200';
       case 'CHECKED_IN':
-        return 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40';
+        return 'bg-blue-50 text-blue-700 border-blue-200';
       default:
-        return 'bg-slate-700 text-slate-300';
+        return 'bg-slate-100 text-slate-700';
     }
   };
 
   return (
     <div className="space-y-6">
-      <div className="glass-card p-6 rounded-2xl border border-slate-800">
-        <h1 className="text-2xl font-black text-white flex items-center gap-3">
-          <CheckSquare className="w-6 h-6 text-cyan-400" />
+      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+        <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
+          <CheckSquare className="w-6 h-6 text-blue-600" />
           My Visitor Approvals & Requests
         </h1>
-        <p className="text-sm text-slate-400 mt-1">
+        <p className="text-sm text-slate-500 font-medium mt-1">
           Review visitor requests assigned to you. Enforces Rule 5 (Max 3 pending requests).
         </p>
       </div>
 
-      <div className="glass-card rounded-2xl border border-slate-800 overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         {loading ? (
-          <div className="py-12 text-center text-slate-400">Loading your visitor requests...</div>
+          <div className="py-12 text-center text-slate-500 font-medium">Loading your visitor requests...</div>
         ) : requests.length === 0 ? (
-          <div className="py-12 text-center text-slate-400">You currently have no visitor requests.</div>
+          <div className="py-12 text-center text-slate-500 font-medium">You currently have no visitor requests.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-900/60 border-b border-slate-800 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              <thead className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
                 <tr>
                   <th className="p-4">Visitor Info</th>
                   <th className="p-4">Purpose</th>
@@ -97,27 +95,27 @@ export default function EmployeeRequests() {
                   <th className="p-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody className="divide-y divide-slate-100">
                 {requests.map((req) => (
-                  <tr key={req._id} className="hover:bg-slate-800/40 transition">
+                  <tr key={req._id} className="hover:bg-slate-50 transition">
                     <td className="p-4">
-                      <div className="font-bold text-slate-100">{req.visitor?.fullName}</div>
-                      <div className="text-xs text-slate-400">{req.visitor?.email}</div>
-                      <div className="text-[11px] text-cyan-400 font-semibold">{req.visitor?.company || 'Individual'}</div>
+                      <div className="font-bold text-slate-900">{req.visitor?.fullName}</div>
+                      <div className="text-xs text-slate-500">{req.visitor?.email}</div>
+                      <div className="text-[11px] text-blue-600 font-semibold">{req.visitor?.company || 'Individual'}</div>
                     </td>
 
-                    <td className="p-4 max-w-xs text-slate-300 text-xs">
+                    <td className="p-4 max-w-xs text-slate-700 text-xs font-medium">
                       {req.purpose}
                       {req.remarks && (
-                        <div className="mt-1 text-[11px] text-amber-300 italic flex items-center gap-1">
-                          <MessageSquare className="w-3 h-3" /> Remarks: "{req.remarks}"
+                        <div className="mt-1 text-[11px] text-slate-500 italic flex items-center gap-1">
+                          <MessageSquare className="w-3 h-3 text-blue-600" /> Remarks: "{req.remarks}"
                         </div>
                       )}
                     </td>
 
-                    <td className="p-4 text-xs font-mono text-slate-300">
+                    <td className="p-4 text-xs font-mono text-slate-700">
                       <div>Date: {req.visitDate}</div>
-                      <div className="text-slate-400">Time: {req.expectedTime}</div>
+                      <div className="text-slate-500">Time: {req.expectedTime}</div>
                     </td>
 
                     <td className="p-4">
@@ -131,13 +129,13 @@ export default function EmployeeRequests() {
                         <>
                           <button
                             onClick={() => setActionModal({ visit: req, action: 'APPROVED' })}
-                            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold transition shadow-md inline-flex items-center gap-1"
+                            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition shadow-xs inline-flex items-center gap-1"
                           >
                             <CheckCircle className="w-3.5 h-3.5" /> Approve
                           </button>
                           <button
                             onClick={() => setActionModal({ visit: req, action: 'REJECTED' })}
-                            className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-bold transition shadow-md inline-flex items-center gap-1"
+                            className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold transition shadow-xs inline-flex items-center gap-1"
                           >
                             <XCircle className="w-3.5 h-3.5" /> Reject
                           </button>
@@ -146,9 +144,9 @@ export default function EmployeeRequests() {
 
                       <button
                         onClick={() => setSelectedVisitId(req._id)}
-                        className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium transition border border-slate-700 inline-flex items-center gap-1"
+                        className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition border border-slate-200 inline-flex items-center gap-1"
                       >
-                        <History className="w-3.5 h-3.5 text-cyan-400" /> History
+                        <History className="w-3.5 h-3.5 text-blue-600" /> History
                       </button>
                     </td>
                   </tr>
@@ -159,33 +157,33 @@ export default function EmployeeRequests() {
         )}
       </div>
 
-      {/* Approval/Rejection Modal with Remarks */}
+      {/* Action Modal */}
       {actionModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="glass-card w-full max-w-md rounded-2xl p-6 relative border border-slate-700">
-            <h3 className="text-lg font-bold text-white flex items-center gap-2 mb-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
+          <div className="bg-white w-full max-w-md rounded-2xl p-6 relative border border-slate-200 shadow-xl">
+            <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2 mb-2">
               {actionModal.action === 'APPROVED' ? (
-                <CheckCircle className="w-5 h-5 text-emerald-400" />
+                <CheckCircle className="w-5 h-5 text-emerald-600" />
               ) : (
-                <XCircle className="w-5 h-5 text-rose-400" />
+                <XCircle className="w-5 h-5 text-rose-600" />
               )}
               {actionModal.action === 'APPROVED' ? 'Approve Visitor Request' : 'Reject Visitor Request'}
             </h3>
-            <p className="text-xs text-slate-400 mb-4">
-              Visitor: <strong className="text-slate-200">{actionModal.visit.visitor?.fullName}</strong> ({actionModal.visit.purpose})
+            <p className="text-xs text-slate-500 font-medium mb-4">
+              Visitor: <strong className="text-slate-900">{actionModal.visit.visitor?.fullName}</strong> ({actionModal.visit.purpose})
             </p>
 
-            {error && <div className="p-3 bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs rounded-xl mb-4">{error}</div>}
+            {error && <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-xl mb-4">{error}</div>}
 
             <form onSubmit={handleActionSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Add Remarks / Notes (Optional)</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Add Remarks / Instructions (Optional)</label>
                 <textarea
                   rows={3}
                   value={remarks}
                   onChange={(e) => setRemarks(e.target.value)}
-                  placeholder={actionModal.action === 'APPROVED' ? 'e.g. Approved. Please escort to Conference Room 2.' : 'e.g. Reschedule needed due to out-of-office.'}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-slate-100 focus:border-cyan-500 focus:outline-none"
+                  placeholder={actionModal.action === 'APPROVED' ? 'e.g. Approved. Escort visitor to Executive Boardroom.' : 'e.g. Reschedule needed due to conflicting meeting.'}
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none font-medium"
                 ></textarea>
               </div>
 
@@ -193,14 +191,14 @@ export default function EmployeeRequests() {
                 <button
                   type="button"
                   onClick={() => setActionModal(null)}
-                  className="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs font-semibold hover:bg-slate-700"
+                  className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-xs font-bold hover:bg-slate-200"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className={`px-4 py-2 text-white rounded-xl text-xs font-bold shadow-lg ${
-                    actionModal.action === 'APPROVED' ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-rose-600 hover:bg-rose-500'
+                  className={`px-4 py-2 text-white rounded-xl text-xs font-bold shadow-md ${
+                    actionModal.action === 'APPROVED' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'
                   }`}
                 >
                   Confirm {actionModal.action === 'APPROVED' ? 'Approval' : 'Rejection'}

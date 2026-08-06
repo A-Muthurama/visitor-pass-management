@@ -8,13 +8,11 @@ import {
   Clock, 
   Calendar, 
   LogIn, 
-  LogOut, 
   CheckCircle, 
-  XCircle,
-  AlertTriangle,
   ArrowUpRight,
   TrendingUp,
-  FileCheck
+  FileCheck,
+  Building
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -46,7 +44,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-cyan-500"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -54,39 +52,39 @@ export default function Dashboard() {
   const renderAdminDashboard = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        <StatCard title="Total Employees" value={stats?.totalEmployees} icon={Users} color="text-purple-400" bg="bg-purple-500/10" border="border-purple-500/20" />
-        <StatCard title="Today's Visitors" value={stats?.todayVisitors} icon={Calendar} color="text-cyan-400" bg="bg-cyan-500/10" border="border-cyan-500/20" />
-        <StatCard title="Currently Inside" value={stats?.currentlyInside} icon={LogIn} color="text-emerald-400" bg="bg-emerald-500/10" border="border-emerald-500/20" />
-        <StatCard title="Pending Approvals" value={stats?.pendingRequests} icon={Clock} color="text-amber-400" bg="bg-amber-500/10" border="border-amber-500/20" />
-        <StatCard title="Scheduled Visitors" value={stats?.scheduledVisitors} icon={UserCheck} color="text-blue-400" bg="bg-blue-500/10" border="border-blue-500/20" />
+        <StatCard title="Total Employees" value={stats?.totalEmployees} icon={Users} color="text-purple-600" bg="bg-purple-50" border="border-purple-200" />
+        <StatCard title="Today's Visitors" value={stats?.todayVisitors} icon={Calendar} color="text-blue-600" bg="bg-blue-50" border="border-blue-200" />
+        <StatCard title="Currently Inside" value={stats?.currentlyInside} icon={LogIn} color="text-emerald-600" bg="bg-emerald-50" border="border-emerald-200" />
+        <StatCard title="Pending Approvals" value={stats?.pendingRequests} icon={Clock} color="text-amber-600" bg="bg-amber-50" border="border-amber-200" />
+        <StatCard title="Scheduled Visitors" value={stats?.scheduledVisitors} icon={UserCheck} color="text-indigo-600" bg="bg-indigo-50" border="border-indigo-200" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 glass-card rounded-2xl p-5 border border-slate-800">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-white flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-cyan-400" />
-              Live Activity Overview
+        <div className="lg:col-span-2 bg-white rounded-2xl p-5 border border-slate-200 shadow-xs">
+          <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-blue-600" />
+              Recent Visitor Logs
             </h3>
-            <Link to="/visitors" className="text-xs font-semibold text-cyan-400 hover:underline flex items-center gap-1">
-              View All <ArrowUpRight className="w-3.5 h-3.5" />
+            <Link to="/visitors" className="text-xs font-bold text-blue-600 hover:underline flex items-center gap-1">
+              View All Log <ArrowUpRight className="w-3.5 h-3.5" />
             </Link>
           </div>
           <VisitTable visits={recentVisits} />
         </div>
 
-        <div className="glass-card rounded-2xl p-5 border border-slate-800 space-y-4">
-          <h3 className="text-lg font-bold text-white flex items-center gap-2">
-            <ShieldCheckIcon /> Quick Actions
+        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-4">
+          <h3 className="text-base font-bold text-slate-900 flex items-center gap-2 pb-3 border-b border-slate-100">
+            <Building className="w-5 h-5 text-blue-600" /> Administrative Actions
           </h3>
           <div className="space-y-2.5">
-            <Link to="/employees" className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 hover:border-cyan-500/40 hover:bg-cyan-500/10 transition text-slate-200 text-sm font-medium">
-              <span>Manage Employees</span>
-              <Users className="w-4 h-4 text-cyan-400" />
+            <Link to="/employees" className="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200 hover:border-blue-300 hover:bg-blue-50/50 transition text-slate-800 text-sm font-semibold">
+              <span>Manage Staff Users</span>
+              <Users className="w-4 h-4 text-blue-600" />
             </Link>
-            <Link to="/reports" className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 hover:border-purple-500/40 hover:bg-purple-500/10 transition text-slate-200 text-sm font-medium">
-              <span>Generate Summary Reports</span>
-              <FileCheck className="w-4 h-4 text-purple-400" />
+            <Link to="/reports" className="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200 hover:border-purple-300 hover:bg-purple-50/50 transition text-slate-800 text-sm font-semibold">
+              <span>Visitor Analytics Reports</span>
+              <FileCheck className="w-4 h-4 text-purple-600" />
             </Link>
           </div>
         </div>
@@ -97,20 +95,20 @@ export default function Dashboard() {
   const renderReceptionistDashboard = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Today's Visitors" value={stats?.todayVisitors} icon={Calendar} color="text-cyan-400" bg="bg-cyan-500/10" border="border-cyan-500/20" />
-        <StatCard title="Currently Inside" value={stats?.currentlyInside} icon={LogIn} color="text-emerald-400" bg="bg-emerald-500/10" border="border-emerald-500/20" />
-        <StatCard title="Today Pending" value={stats?.todayPending} icon={Clock} color="text-amber-400" bg="bg-amber-500/10" border="border-amber-500/20" />
-        <StatCard title="Today Approved" value={stats?.todayApproved} icon={CheckCircle} color="text-blue-400" bg="bg-blue-500/10" border="border-blue-500/20" />
+        <StatCard title="Today's Visitors" value={stats?.todayVisitors} icon={Calendar} color="text-blue-600" bg="bg-blue-50" border="border-blue-200" />
+        <StatCard title="Currently Inside" value={stats?.currentlyInside} icon={LogIn} color="text-emerald-600" bg="bg-emerald-50" border="border-emerald-200" />
+        <StatCard title="Today Pending" value={stats?.todayPending} icon={Clock} color="text-amber-600" bg="bg-amber-50" border="border-amber-200" />
+        <StatCard title="Today Approved" value={stats?.todayApproved} icon={CheckCircle} color="text-indigo-600" bg="bg-indigo-50" border="border-indigo-200" />
       </div>
 
-      <div className="glass-card rounded-2xl p-5 border border-slate-800">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 pb-3 border-b border-slate-100">
           <div>
-            <h3 className="text-lg font-bold text-white">Front Desk Active Visitors</h3>
-            <p className="text-xs text-slate-400">Perform Check-In and Check-Out operations instantly.</p>
+            <h3 className="text-base font-bold text-slate-900">Front Desk Check-In Desk</h3>
+            <p className="text-xs text-slate-500 font-medium">Register visitors and issue visitor entry passes.</p>
           </div>
-          <Link to="/register-visitor" className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-cyan-500/20 transition flex items-center gap-1.5">
-            + New Visitor Registration
+          <Link to="/register-visitor" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/20 transition flex items-center gap-1.5 self-start">
+            + Register New Visitor
           </Link>
         </div>
         <VisitTable visits={recentVisits} />
@@ -121,19 +119,19 @@ export default function Dashboard() {
   const renderEmployeeDashboard = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Pending My Approval" value={stats?.pendingRequests} icon={Clock} color="text-amber-400" bg="bg-amber-500/10" border="border-amber-500/20" highlight={stats?.pendingRequests > 0} />
-        <StatCard title="Approved Visits Today" value={stats?.todayApprovedVisits} icon={CheckCircle} color="text-emerald-400" bg="bg-emerald-500/10" border="border-emerald-500/20" />
-        <StatCard title="Visitors Currently Visiting Me" value={stats?.activeVisitorsInside} icon={LogIn} color="text-cyan-400" bg="bg-cyan-500/10" border="border-cyan-500/20" />
-        <StatCard title="Total Visit History" value={stats?.totalHistory} icon={Users} color="text-purple-400" bg="bg-purple-500/10" border="border-purple-500/20" />
+        <StatCard title="Pending My Approval" value={stats?.pendingRequests} icon={Clock} color="text-amber-600" bg="bg-amber-50" border="border-amber-200" highlight={stats?.pendingRequests > 0} />
+        <StatCard title="Approved Visits Today" value={stats?.todayApprovedVisits} icon={CheckCircle} color="text-emerald-600" bg="bg-emerald-50" border="border-emerald-200" />
+        <StatCard title="Visitors Currently Visiting Me" value={stats?.activeVisitorsInside} icon={LogIn} color="text-blue-600" bg="bg-blue-50" border="border-blue-200" />
+        <StatCard title="Total Visit History" value={stats?.totalHistory} icon={Users} color="text-purple-600" bg="bg-purple-50" border="border-purple-200" />
       </div>
 
-      <div className="glass-card rounded-2xl p-5 border border-slate-800">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs">
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
           <div>
-            <h3 className="text-lg font-bold text-white">My Incoming Visitor Requests</h3>
-            <p className="text-xs text-slate-400">Review, approve, or reject visitor requests assigned to you.</p>
+            <h3 className="text-base font-bold text-slate-900">My Incoming Visitor Requests</h3>
+            <p className="text-xs text-slate-500 font-medium">Review and respond to guest visit requests.</p>
           </div>
-          <Link to="/requests" className="text-xs font-semibold text-cyan-400 hover:underline">
+          <Link to="/requests" className="text-xs font-bold text-blue-600 hover:underline">
             Manage Requests &rarr;
           </Link>
         </div>
@@ -144,18 +142,18 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-6 rounded-2xl border border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
         <div>
-          <h1 className="text-2xl font-black text-white tracking-tight">
-            Welcome Back, <span className="text-cyan-400">{user.name}</span>
+          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+            Welcome back, <span className="text-blue-600">{user.name}</span>
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
-            Logged in as <span className="font-semibold text-slate-200">{user.role}</span> ({user.department} Department)
+          <p className="text-sm text-slate-500 font-medium mt-1">
+            Logged in as <span className="font-bold text-slate-800">{user.role}</span> ({user.department} Department)
           </p>
         </div>
-        <div className="text-right">
-          <div className="text-xs text-slate-400">System Time (Local)</div>
-          <div className="text-sm font-bold text-cyan-400 font-mono">{new Date().toLocaleTimeString()}</div>
+        <div className="text-left sm:text-right bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200">
+          <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">System Time</div>
+          <div className="text-sm font-bold text-slate-800 font-mono">{new Date().toLocaleTimeString()}</div>
         </div>
       </div>
 
@@ -168,11 +166,11 @@ export default function Dashboard() {
 
 function StatCard({ title, value, icon: Icon, color, bg, border, highlight }) {
   return (
-    <div className={`glass-card p-4 rounded-2xl border ${border} relative overflow-hidden transition-all hover:scale-[1.02]`}>
+    <div className={`bg-white p-4 rounded-2xl border ${border} relative overflow-hidden transition-all shadow-xs`}>
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{title}</p>
-          <p className={`text-2xl font-black mt-1 text-white ${highlight ? 'text-amber-400 animate-pulse' : ''}`}>{value || 0}</p>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{title}</p>
+          <p className={`text-2xl font-black mt-1 text-slate-900 ${highlight ? 'text-amber-600' : ''}`}>{value || 0}</p>
         </div>
         <div className={`p-3 rounded-xl ${bg} ${color}`}>
           <Icon className="w-5 h-5" />
@@ -184,23 +182,23 @@ function StatCard({ title, value, icon: Icon, color, bg, border, highlight }) {
 
 function VisitTable({ visits }) {
   if (!visits || visits.length === 0) {
-    return <div className="py-8 text-center text-sm text-slate-400">No recent visitor records found.</div>;
+    return <div className="py-8 text-center text-sm text-slate-400 font-medium">No recent visitor records found.</div>;
   }
 
   const getStatusBadge = (status) => {
     switch (status) {
       case 'PENDING':
-        return 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+        return 'bg-amber-50 text-amber-700 border-amber-200';
       case 'APPROVED':
-        return 'bg-blue-500/20 text-blue-300 border-blue-500/40';
+        return 'bg-blue-50 text-blue-700 border-blue-200';
       case 'CHECKED_IN':
-        return 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
       case 'CHECKED_OUT':
-        return 'bg-slate-700 text-slate-300 border-slate-600';
+        return 'bg-slate-100 text-slate-700 border-slate-200';
       case 'REJECTED':
-        return 'bg-rose-500/20 text-rose-300 border-rose-500/40';
+        return 'bg-rose-50 text-rose-700 border-rose-200';
       default:
-        return 'bg-slate-800 text-slate-400';
+        return 'bg-slate-100 text-slate-600';
     }
   };
 
@@ -208,25 +206,25 @@ function VisitTable({ visits }) {
     <div className="overflow-x-auto">
       <table className="w-full text-left text-sm">
         <thead>
-          <tr className="border-b border-slate-800 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+          <tr className="border-b border-slate-200 text-xs font-bold text-slate-400 uppercase tracking-wider">
             <th className="pb-3">Visitor Name</th>
             <th className="pb-3">Host Employee</th>
             <th className="pb-3">Date & Time</th>
             <th className="pb-3">Status</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-800/60">
+        <tbody className="divide-y divide-slate-100">
           {visits.map((v) => (
-            <tr key={v._id} className="hover:bg-slate-800/40 transition">
-              <td className="py-3 font-medium text-slate-100">
+            <tr key={v._id} className="hover:bg-slate-50 transition">
+              <td className="py-3 font-semibold text-slate-900">
                 {v.visitor?.fullName || 'N/A'}
-                <div className="text-[11px] text-slate-400">{v.visitor?.company}</div>
+                <div className="text-[11px] text-slate-500 font-normal">{v.visitor?.company}</div>
               </td>
-              <td className="py-3 text-slate-300">
+              <td className="py-3 text-slate-700 font-medium">
                 {v.hostEmployee?.name || 'N/A'}
-                <div className="text-[11px] text-slate-400">{v.hostEmployee?.department}</div>
+                <div className="text-[11px] text-slate-400 font-normal">{v.hostEmployee?.department}</div>
               </td>
-              <td className="py-3 text-slate-300 text-xs font-mono">
+              <td className="py-3 text-slate-600 text-xs font-mono">
                 {v.visitDate} @ {v.expectedTime}
               </td>
               <td className="py-3">
@@ -239,13 +237,5 @@ function VisitTable({ visits }) {
         </tbody>
       </table>
     </div>
-  );
-}
-
-function ShieldCheckIcon() {
-  return (
-    <svg className="w-5 h-5 text-purple-400 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-    </svg>
   );
 }

@@ -1,7 +1,7 @@
 // client/src/pages/ManageEmployees.jsx
 import React, { useEffect, useState } from 'react';
 import API from '../services/api';
-import { Users, UserPlus, Shield, Mail, Phone, Building, CheckCircle, XCircle, Plus, X } from 'lucide-react';
+import { Users, Plus, X } from 'lucide-react';
 
 export default function ManageEmployees() {
   const [employees, setEmployees] = useState([]);
@@ -68,62 +68,62 @@ export default function ManageEmployees() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-6 rounded-2xl border border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
         <div>
-          <h1 className="text-2xl font-black text-white flex items-center gap-3">
-            <Users className="w-6 h-6 text-purple-400" />
-            Manage Organization Staff & Users
+          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
+            <Users className="w-6 h-6 text-purple-600" />
+            Manage Staff Accounts & System Roles
           </h1>
-          <p className="text-sm text-slate-400 mt-1">Admin Management of Employees, Receptionists, and User Roles.</p>
+          <p className="text-sm text-slate-500 font-medium mt-1">Admin User Management for Employees, Receptionists, and Administrators.</p>
         </div>
         <button
           onClick={() => setModalOpen(true)}
-          className="px-4 py-2.5 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-purple-500/20 transition flex items-center gap-2"
+          className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs shadow-md shadow-purple-600/20 transition flex items-center gap-2"
         >
-          <Plus className="w-4 h-4" /> Add New User
+          <Plus className="w-4 h-4" /> Add User Account
         </button>
       </div>
 
-      <div className="glass-card rounded-2xl border border-slate-800 overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         {loading ? (
-          <div className="py-12 text-center text-slate-400">Loading user accounts...</div>
+          <div className="py-12 text-center text-slate-500 font-medium">Loading user accounts...</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-900/60 border-b border-slate-800 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              <thead className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
                 <tr>
                   <th className="p-4">User Details</th>
-                  <th className="p-4">Role</th>
+                  <th className="p-4">System Role</th>
                   <th className="p-4">Department</th>
-                  <th className="p-4">Status</th>
+                  <th className="p-4">Account Status</th>
                   <th className="p-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody className="divide-y divide-slate-100">
                 {employees.map((emp) => (
-                  <tr key={emp._id} className="hover:bg-slate-800/40 transition">
+                  <tr key={emp._id} className="hover:bg-slate-50 transition">
                     <td className="p-4">
-                      <div className="font-bold text-slate-100">{emp.name}</div>
-                      <div className="text-xs text-slate-400">{emp.email} | {emp.phone || 'No Phone'}</div>
+                      <div className="font-bold text-slate-900">{emp.name}</div>
+                      <div className="text-xs text-slate-500">{emp.email} | {emp.phone || 'No Phone'}</div>
                     </td>
 
                     <td className="p-4">
                       <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${
-                        emp.role === 'ADMIN' ? 'bg-purple-500/20 text-purple-300 border-purple-500/40' :
-                        emp.role === 'RECEPTIONIST' ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40' :
-                        'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                        emp.role === 'ADMIN' ? 'bg-purple-50 text-purple-700 border-purple-200' :
+                        emp.role === 'RECEPTIONIST' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                        'bg-emerald-50 text-emerald-700 border-emerald-200'
                       }`}>
                         {emp.role}
                       </span>
                     </td>
 
-                    <td className="p-4 text-slate-300 text-xs font-medium">
+                    <td className="p-4 text-slate-700 text-xs font-semibold">
                       {emp.department}
                     </td>
 
                     <td className="p-4">
-                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                        emp.isActive ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'
+                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+                        emp.isActive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'
                       }`}>
                         {emp.isActive ? 'Active' : 'Deactivated'}
                       </span>
@@ -134,8 +134,8 @@ export default function ManageEmployees() {
                         onClick={() => handleToggleActive(emp._id)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition border ${
                           emp.isActive 
-                            ? 'bg-rose-500/10 text-rose-300 border-rose-500/30 hover:bg-rose-500/20' 
-                            : 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/20'
+                            ? 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100' 
+                            : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
                         }`}
                       >
                         {emp.isActive ? 'Deactivate' : 'Activate'}
@@ -151,41 +151,41 @@ export default function ManageEmployees() {
 
       {/* Add User Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="glass-card w-full max-w-md rounded-2xl p-6 relative border border-slate-700">
-            <button onClick={() => setModalOpen(false)} className="absolute top-4 right-4 p-1 text-slate-400 hover:text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
+          <div className="bg-white w-full max-w-md rounded-2xl p-6 relative border border-slate-200 shadow-xl">
+            <button onClick={() => setModalOpen(false)} className="absolute top-4 right-4 p-1 text-slate-400 hover:text-slate-700">
               <X className="w-5 h-5" />
             </button>
-            <h3 className="text-lg font-bold text-white mb-2">Create New User Account</h3>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Create Staff User Account</h3>
 
-            {error && <div className="p-3 bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs rounded-xl mb-4">{error}</div>}
+            {error && <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-xl mb-4">{error}</div>}
 
             <form onSubmit={handleCreateUser} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Full Name</label>
-                <input type="text" required name="name" value={formData.name} onChange={handleChange} placeholder="e.g. Sarah Connor" className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-100 focus:border-purple-500 focus:outline-none" />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Full Name</label>
+                <input type="text" required name="name" value={formData.name} onChange={handleChange} placeholder="e.g. Sarah Connor" className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-purple-600 focus:outline-none font-medium" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Email Address</label>
-                <input type="email" required name="email" value={formData.email} onChange={handleChange} placeholder="sarah@system.com" className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-100 focus:border-purple-500 focus:outline-none" />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
+                <input type="email" required name="email" value={formData.email} onChange={handleChange} placeholder="sarah@system.com" className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-purple-600 focus:outline-none font-medium" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Role</label>
-                  <select name="role" value={formData.role} onChange={handleChange} className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-100 focus:border-purple-500 focus:outline-none">
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Role</label>
+                  <select name="role" value={formData.role} onChange={handleChange} className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-purple-600 focus:outline-none font-medium">
                     <option value="EMPLOYEE">EMPLOYEE</option>
                     <option value="RECEPTIONIST">RECEPTIONIST</option>
                     <option value="ADMIN">ADMIN</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Department</label>
-                  <input type="text" name="department" value={formData.department} onChange={handleChange} placeholder="HR / Tech" className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-100 focus:border-purple-500 focus:outline-none" />
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Department</label>
+                  <input type="text" name="department" value={formData.department} onChange={handleChange} placeholder="HR / Tech" className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-purple-600 focus:outline-none font-medium" />
                 </div>
               </div>
               <div className="flex justify-end gap-2 pt-2">
-                <button type="button" onClick={() => setModalOpen(false)} className="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs font-semibold hover:bg-slate-700">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold shadow-lg">Save User Account</button>
+                <button type="button" onClick={() => setModalOpen(false)} className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-xs font-bold hover:bg-slate-200">Cancel</button>
+                <button type="submit" className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow-md">Save User Account</button>
               </div>
             </form>
           </div>
