@@ -1,7 +1,7 @@
 // client/src/pages/RegisterVisitor.jsx
 import React, { useState, useEffect } from 'react';
 import API from '../services/api';
-import { UserPlus, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { UserPlus, AlertCircle, CheckCircle2, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function RegisterVisitor() {
@@ -25,6 +25,7 @@ export default function RegisterVisitor() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [toastModal, setToastModal] = useState(null); // { type: 'error' | 'success', title: string, message: string }
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -46,20 +47,25 @@ export default function RegisterVisitor() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const triggerToast = (type, title, message) => {
+    setError(message);
+    setToastModal({ type, title, message });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
-    // Professional Date bounds check
+    // Date bounds check
     if (formData.visitDate < todayDateStr) {
-      setError('Scheduled visit date cannot be earlier than today.');
+      triggerToast('error', 'Validation Notice', 'Scheduled visit date cannot be earlier than today.');
       return;
     }
 
-    // Professional Time bounds check if date is today
+    // Time bounds check if date is today
     if (formData.visitDate === todayDateStr && formData.expectedTime < currentTimeStr) {
-      setError("For today's registration, expected arrival time cannot be earlier than current time.");
+      triggerToast('error', 'Validation Notice', "For today's registration, expected arrival time cannot be earlier than current time.");
       return;
     }
 
@@ -68,14 +74,18 @@ export default function RegisterVisitor() {
     try {
       await API.post('/visits', formData);
       setSuccess('Visitor request registered successfully! Pending host employee approval.');
+      setToastModal({
+        type: 'success',
+        title: 'Registration Successful',
+        message: 'Visitor request registered successfully! Redirecting to Visitor Master Log...',
+      });
       setTimeout(() => {
         navigate('/visitors');
       }, 1500);
     } catch (err) {
-      // Clean backend error messages by removing "Rule X Violation: " prefixes if any
       const rawMsg = err.response?.data?.message || 'Failed to register visitor';
       const cleanMsg = rawMsg.replace(/^Rule \d+ Violation:\s*/i, '');
-      setError(cleanMsg);
+      triggerToast('error', 'Registration Notice', cleanMsg);
     } finally {
       setLoading(false);
     }
@@ -95,21 +105,6 @@ export default function RegisterVisitor() {
 
       <form onSubmit={handleSubmit} className="bg-white p-5 sm:p-7 rounded-2xl border border-slate-200 shadow-xs space-y-6">
         
-        {/* Error Alert placed cleanly inside form directly above submit button */}
-        {error && (
-          <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-semibold flex items-center gap-3 animate-in fade-in slide-in-from-top-1">
-            <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-600" />
-            <span>{error}</span>
-          </div>
-        )}
-
-        {success && (
-          <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-semibold flex items-center gap-3 animate-in fade-in slide-in-from-top-1">
-            <CheckCircle2 className="w-5 h-5 flex-shrink-0 text-emerald-600" />
-            <span>{success}</span>
-          </div>
-        )}
-
         {/* Section 1: Visitor Profile */}
         <div>
           <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">
@@ -260,6 +255,14 @@ export default function RegisterVisitor() {
           </div>
         </div>
 
+        {/* Inline alert right above Submit button */}
+        {error && (
+          <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-semibold flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-600" />
+            <span>{error}</span>
+          </div>
+        )}
+
         <button
           type="submit"
           disabled={loading}
@@ -268,6 +271,46 @@ export default function RegisterVisitor() {
           {loading ? 'Submitting Visitor Registration...' : 'Submit Visitor Registration Request'}
         </button>
       </form>
+
+      {/* Floating Center-Screen Popup Modal for Instant Notice Visibility */}
+      {toastModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-sm rounded-2xl p-6 relative border border-slate-200 shadow-2xl text-center space-y-4">
+            <button
+              onClick={() => setToastModal(null)}
+              className="absolute top-4 right-4 p-1 text-slate-400 hover:text-slate-700 rounded-lg"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className={`w-12 h-12 rounded-2xl mx-auto flex items-center justify-center ${
+              toastModal.type === 'success' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'
+            }`}>
+              {toastModal.type === 'success' ? (
+                <CheckCircle2 className="w-7 h-7" />
+              ) : (
+                <AlertCircle className="w-7 h-7" />
+              )}
+            </div>
+
+            <div>
+              <h3 className="text-lg font-bold text-slate-900">{toastModal.title}</h3>
+              <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1 leading-relaxed">
+                {toastModal.message}
+              </p>
+            </div>
+
+            <button
+              onClick={() => setToastModal(null)}
+              className={`w-full py-2.5 px-4 rounded-xl text-white font-bold text-xs shadow-md transition ${
+                toastModal.type === 'success' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'
+              }`}
+            >
+              Understand & Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
