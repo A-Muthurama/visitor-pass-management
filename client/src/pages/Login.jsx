@@ -8,7 +8,6 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [selectedRole, setSelectedRole] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -29,10 +28,9 @@ export default function Login() {
     }
   };
 
-  const handleQuickDemo = (role, demoEmail) => {
-    setSelectedRole(role);
-    setEmail(demoEmail);
-    setPassword('password123');
+  const handleQuickAdminDemo = () => {
+    setEmail('admin@control.com');
+    setPassword('Admin@321');
   };
 
   return (
@@ -51,56 +49,24 @@ export default function Login() {
 
         <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-xl shadow-slate-200/60 space-y-5">
           
-          {/* TOP ROLE SELECTOR BUTTONS */}
+          {/* System Admin Quick Button */}
           <div className="space-y-2">
             <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider text-center">
-              Quick Role Login Selection
+              Default System Admin Login
             </label>
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('ADMIN', 'admin@system.com')}
-                className={`py-2.5 px-3 rounded-xl font-bold text-xs transition border flex flex-col items-center justify-center gap-1 ${
-                  selectedRole === 'ADMIN'
-                    ? 'bg-purple-600 text-white border-purple-600 shadow-md shadow-purple-600/20'
-                    : 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100'
-                }`}
-              >
-                <UserCheck className="w-4 h-4" />
-                <span>Admin</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('RECEPTIONIST', 'receptionist@system.com')}
-                className={`py-2.5 px-3 rounded-xl font-bold text-xs transition border flex flex-col items-center justify-center gap-1 ${
-                  selectedRole === 'RECEPTIONIST'
-                    ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-600/20'
-                    : 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
-                }`}
-              >
-                <UserCheck className="w-4 h-4" />
-                <span>Receptionist</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('EMPLOYEE', 'alex@system.com')}
-                className={`py-2.5 px-3 rounded-xl font-bold text-xs transition border flex flex-col items-center justify-center gap-1 ${
-                  selectedRole === 'EMPLOYEE'
-                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20'
-                    : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
-                }`}
-              >
-                <UserCheck className="w-4 h-4" />
-                <span>Employee</span>
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={handleQuickAdminDemo}
+              className="w-full py-2.5 px-4 rounded-xl font-bold text-xs bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 transition flex items-center justify-center gap-2 shadow-2xs"
+            >
+              <UserCheck className="w-4 h-4 text-purple-600" />
+              <span>Click to Fill Admin (admin@control.com)</span>
+            </button>
           </div>
 
           <div className="relative flex py-1 items-center">
             <div className="flex-grow border-t border-slate-100"></div>
-            <span className="flex-shrink mx-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Or enter credentials</span>
+            <span className="flex-shrink mx-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Or Login with staff credentials</span>
             <div className="flex-grow border-t border-slate-100"></div>
           </div>
 
@@ -122,11 +88,8 @@ export default function Login() {
                   type="email"
                   required
                   value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    setSelectedRole('');
-                  }}
-                  placeholder="admin@system.com"
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="admin@control.com"
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white transition-all font-semibold"
                 />
               </div>
