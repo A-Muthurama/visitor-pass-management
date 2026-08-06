@@ -9,7 +9,7 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const visitRoutes = require('./routes/visitRoutes');
 const reportRoutes = require('./routes/reportRoutes');
-const { seedDatabase } = require('./utils/seedData');
+const seedAdminUser = require('./utils/seedData');
 
 const app = express();
 
@@ -29,38 +29,34 @@ app.get('/api/health', (req, res) => {
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
-const startServer = async () => {
-  try {
-    if (MONGO_URI && MONGO_URI.trim() !== '') {
-      console.log('Connecting to provided MongoDB Atlas URI...');
-      try {
-        await mongoose.connect(MONGO_URI, {
-          serverSelectionTimeoutMS: 5000,
-        });
-        console.log('✅ Connected to MongoDB Atlas successfully!');
-      } catch (err) {
-        console.warn('⚠️ Atlas connection failed (check Network Access IP Whitelist on Atlas):', err.message);
-        console.log('Falling back to MongoDB In-Memory Server so application keeps running seamlessly...');
-        const mongoServer = await MongoMemoryServer.create();
-        await mongoose.connect(mongoServer.getUri());
-        console.log('✅ Connected to MongoDB In-Memory Server!');
-      }
-    } else {
-      console.log('MONGO_URI not set. Launching MongoDB In-Memory Server...');
-      const mongoServer = await MongoMemoryServer.create();
-      await mongoose.connect(mongoServer.getUri());
-      console.log('✅ Connected to MongoDB In-Memory Server!');
+const connectWithFallback = async () => {
+  if (MONGO_URI) {
+    try {
+      console.log('Attempting connection to MongoDB Atlas...');
+      await mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 5000 });
+      console.log('✅ Connected to MongoDB Atlas');
+      await seedAdminUser();
+      return;
+    } catch (err) {
+      console.warn('⚠️ Could not connect to MongoDB Atlas URI. Falling back to MongoMemoryServer...', err.message);
     }
+  } else {
+    console.log('No MONGO_URI provided. Starting in-memory MongoDB...');
+  }
 
-    // Seed default demo data if empty
-    await seedDatabase();
-
-    app.listen(PORT, () => {
-      console.log(`🚀 Server listening on port ${PORT}`);
-    });
-  } catch (error) {
-    console.error('Failed to start server:', error.message);
+  try {
+    const mongoServer = await MongoMemoryServer.create();
+    const mongoUri = mongoServer.getUri();
+    await mongoose.connect(mongoUri);
+    console.log('✅ Connected to In-Memory MongoDB Server:', mongoUri);
+    await seedAdminUser();
+  } catch (err) {
+    console.error('❌ Failed to start In-Memory MongoDB:', err);
   }
 };
 
-startServer();
+connectWithFallback().then(() => {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+  });
+});
