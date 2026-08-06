@@ -1,8 +1,9 @@
 // client/src/services/api.js
 import axios from 'axios';
 
+// Dynamically use Render backend live API URL if defined, otherwise default to local
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
 });
 
 // Request interceptor to append JWT token
@@ -19,7 +20,6 @@ API.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Clear token on unauthorized
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       if (window.location.pathname !== '/login') {
