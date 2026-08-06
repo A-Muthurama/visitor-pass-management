@@ -4,24 +4,27 @@ const bcrypt = require('bcryptjs');
 
 const seedAdminUser = async () => {
   try {
-    const adminEmail = 'admin@control.com';
     const hashedPassword = await bcrypt.hash('Admin@321', 10);
-    
-    // Always upsert/reset the default admin account password to guarantee login works in production
-    await User.findOneAndUpdate(
-      { email: adminEmail },
+
+    const admin = await User.findOneAndUpdate(
+      { email: 'admin@control.com' },
       {
-        name: 'System Admin',
-        email: adminEmail,
-        phone: '+91 98765 43210',
-        password: hashedPassword,
-        role: 'ADMIN',
-        department: 'IT & Security',
-        isActive: true,
+        $setOnInsert: {
+          name: 'System Admin',
+          email: 'admin@control.com',
+          phone: '+91 98765 43210',
+          role: 'ADMIN',
+          department: 'IT & Security',
+          isActive: true,
+        },
+        $set: {
+          password: hashedPassword
+        }
       },
       { upsert: true, new: true }
     );
-    console.log('✅ Default System Admin seeded/verified: admin@control.com / Admin@321');
+
+    console.log('✅ Default System Admin seeded & password synchronized: admin@control.com / Admin@321');
   } catch (err) {
     console.error('Failed to seed admin user:', err);
   }
