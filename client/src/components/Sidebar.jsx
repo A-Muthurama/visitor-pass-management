@@ -2,12 +2,12 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { 
-  LayoutDashboard, 
-  UserPlus, 
-  Users, 
-  ClipboardList, 
-  FileBarChart, 
+import {
+  LayoutDashboard,
+  UserPlus,
+  Users,
+  ClipboardList,
+  FileBarChart,
   CheckSquare,
   ShieldCheck,
   LogOut,
@@ -82,10 +82,9 @@ export default function Sidebar() {
                 key={link.path}
                 to={link.path}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all duration-150 ${
-                    isActive
-                      ? 'bg-blue-50 text-blue-700 font-semibold border border-blue-200/80 shadow-2xs'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                  `flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all duration-150 ${isActive
+                    ? 'bg-blue-50 text-blue-700 font-semibold border border-blue-200/80 shadow-2xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                   }`
                 }
               >
@@ -111,10 +110,10 @@ export default function Sidebar() {
         <div className="p-3.5 bg-blue-50/60 rounded-xl border border-blue-200">
           <div className="flex items-center gap-2 text-blue-800 text-xs font-bold mb-1">
             <Building2 className="w-4 h-4 text-blue-600" />
-            Front Desk Support
+            Visitor Pass Support
           </div>
           <p className="text-[11px] text-slate-600 leading-relaxed font-medium">
-            Visitor check-in hours: <strong className="text-slate-800">9:00 AM - 6:00 PM</strong>. Need help? Contact Front Desk Reception.
+            Visitor check-in hours: <strong className="text-slate-800">9:00 AM - 6:00 PM</strong>.
           </p>
         </div>
       </div>
