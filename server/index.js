@@ -31,16 +31,25 @@ const MONGO_URI = process.env.MONGO_URI;
 
 const startServer = async () => {
   try {
-    if (MONGO_URI) {
-      console.log('Connecting to provided MongoDB URI...');
-      await mongoose.connect(MONGO_URI);
-      console.log('✅ Connected to MongoDB via MONGO_URI');
+    if (MONGO_URI && MONGO_URI.trim() !== '') {
+      console.log('Connecting to provided MongoDB Atlas URI...');
+      try {
+        await mongoose.connect(MONGO_URI, {
+          serverSelectionTimeoutMS: 5000,
+        });
+        console.log('✅ Connected to MongoDB Atlas successfully!');
+      } catch (err) {
+        console.warn('⚠️ Atlas connection failed (check Network Access IP Whitelist on Atlas):', err.message);
+        console.log('Falling back to MongoDB In-Memory Server so application keeps running seamlessly...');
+        const mongoServer = await MongoMemoryServer.create();
+        await mongoose.connect(mongoServer.getUri());
+        console.log('✅ Connected to MongoDB In-Memory Server!');
+      }
     } else {
-      console.log('MONGO_URI not provided. Launching MongoDB In-Memory Server for zero-setup execution...');
+      console.log('MONGO_URI not set. Launching MongoDB In-Memory Server...');
       const mongoServer = await MongoMemoryServer.create();
-      const uri = mongoServer.getUri();
-      await mongoose.connect(uri);
-      console.log('✅ Connected to MongoDB In-Memory Server at:', uri);
+      await mongoose.connect(mongoServer.getUri());
+      console.log('✅ Connected to MongoDB In-Memory Server!');
     }
 
     // Seed default demo data if empty

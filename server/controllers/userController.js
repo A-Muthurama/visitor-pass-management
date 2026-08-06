@@ -56,6 +56,43 @@ const createUser = async (req, res) => {
   }
 };
 
+// @desc Update existing User Account
+// @route PUT /api/users/:id
+// @access Admin
+const updateUser = async (req, res) => {
+  try {
+    const { name, email, role, department, phone, password } = req.body;
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User account not found' });
+    }
+
+    user.name = name || user.name;
+    user.email = email ? email.toLowerCase() : user.email;
+    user.role = role || user.role;
+    user.department = department || user.department;
+    user.phone = phone !== undefined ? phone : user.phone;
+
+    if (password) {
+      user.password = await bcrypt.hash(password, 10);
+    }
+
+    await user.save();
+
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      department: user.department,
+      phone: user.phone,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // @desc Toggle User Active Status / Delete
 // @route DELETE /api/users/:id
 // @access Admin
@@ -75,4 +112,4 @@ const toggleUserActive = async (req, res) => {
   }
 };
 
-module.exports = { getUsers, createUser, toggleUserActive };
+module.exports = { getUsers, createUser, updateUser, toggleUserActive };

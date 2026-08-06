@@ -1,20 +1,22 @@
 // client/src/pages/ManageEmployees.jsx
 import React, { useEffect, useState } from 'react';
 import API from '../services/api';
-import { Users, Plus, X } from 'lucide-react';
+import { Users, Plus, X, Edit2, Phone, Mail, Building, UserCheck } from 'lucide-react';
 
 export default function ManageEmployees() {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
   const [error, setError] = useState('');
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: 'password123',
+    phone: '',
+    password: '',
     role: 'EMPLOYEE',
     department: 'Engineering',
-    phone: '',
   });
 
   const fetchEmployees = async () => {
@@ -33,27 +35,54 @@ export default function ManageEmployees() {
     fetchEmployees();
   }, []);
 
+  const openCreateModal = () => {
+    setEditingUser(null);
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      password: 'password123',
+      role: 'EMPLOYEE',
+      department: 'Engineering',
+    });
+    setError('');
+    setModalOpen(true);
+  };
+
+  const openEditModal = (user) => {
+    setEditingUser(user);
+    setFormData({
+      name: user.name || '',
+      email: user.email || '',
+      phone: user.phone || '',
+      password: '', // blank unless updating
+      role: user.role || 'EMPLOYEE',
+      department: user.department || 'General',
+    });
+    setError('');
+    setModalOpen(true);
+  };
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleCreateUser = async (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
     try {
-      await API.post('/users', formData);
+      if (editingUser) {
+        // Edit User
+        await API.put(`/users/${editingUser._id}`, formData);
+      } else {
+        // Create User
+        await API.post('/users', formData);
+      }
       setModalOpen(false);
-      setFormData({
-        name: '',
-        email: '',
-        password: 'password123',
-        role: 'EMPLOYEE',
-        department: 'Engineering',
-        phone: '',
-      });
       fetchEmployees();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create user');
+      setError(err.response?.data?.message || 'Failed to save user account');
     }
   };
 
@@ -77,7 +106,7 @@ export default function ManageEmployees() {
           <p className="text-sm text-slate-500 font-medium mt-1">Admin User Management for Employees, Receptionists, and Administrators.</p>
         </div>
         <button
-          onClick={() => setModalOpen(true)}
+          onClick={openCreateModal}
           className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs shadow-md shadow-purple-600/20 transition flex items-center gap-2"
         >
           <Plus className="w-4 h-4" /> Add User Account
@@ -93,6 +122,7 @@ export default function ManageEmployees() {
               <thead className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
                 <tr>
                   <th className="p-4">User Details</th>
+                  <th className="p-4">Mobile / Phone</th>
                   <th className="p-4">System Role</th>
                   <th className="p-4">Department</th>
                   <th className="p-4">Account Status</th>
@@ -104,7 +134,18 @@ export default function ManageEmployees() {
                   <tr key={emp._id} className="hover:bg-slate-50 transition">
                     <td className="p-4">
                       <div className="font-bold text-slate-900">{emp.name}</div>
-                      <div className="text-xs text-slate-500">{emp.email} | {emp.phone || 'No Phone'}</div>
+                      <div className="text-xs text-slate-500">{emp.email}</div>
+                    </td>
+
+                    <td className="p-4 text-slate-700 font-mono text-xs font-semibold">
+                      {emp.phone ? (
+                        <div className="flex items-center gap-1.5">
+                          <Phone className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
+                          <span>{emp.phone}</span>
+                        </div>
+                      ) : (
+                        <span className="text-slate-400 font-normal">Not Provided</span>
+                      )}
                     </td>
 
                     <td className="p-4">
@@ -129,7 +170,14 @@ export default function ManageEmployees() {
                       </span>
                     </td>
 
-                    <td className="p-4 text-right">
+                    <td className="p-4 text-right space-x-2">
+                      <button
+                        onClick={() => openEditModal(emp)}
+                        className="px-3 py-1.5 rounded-lg text-xs font-bold transition border bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200 inline-flex items-center gap-1"
+                      >
+                        <Edit2 className="w-3.5 h-3.5 text-blue-600" /> Edit
+                      </button>
+
                       <button
                         onClick={() => handleToggleActive(emp._id)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition border ${
@@ -149,30 +197,68 @@ export default function ManageEmployees() {
         )}
       </div>
 
-      {/* Add User Modal */}
+      {/* Add / Edit User Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
           <div className="bg-white w-full max-w-md rounded-2xl p-6 relative border border-slate-200 shadow-xl">
             <button onClick={() => setModalOpen(false)} className="absolute top-4 right-4 p-1 text-slate-400 hover:text-slate-700">
               <X className="w-5 h-5" />
             </button>
-            <h3 className="text-lg font-bold text-slate-900 mb-2">Create Staff User Account</h3>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">
+              {editingUser ? 'Edit Staff Account' : 'Create Staff User Account'}
+            </h3>
 
             {error && <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-xl mb-4">{error}</div>}
 
-            <form onSubmit={handleCreateUser} className="space-y-4">
+            <form onSubmit={handleFormSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Full Name</label>
-                <input type="text" required name="name" value={formData.name} onChange={handleChange} placeholder="e.g. Sarah Connor" className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-purple-600 focus:outline-none font-medium" />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="e.g. Sarah Connor"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-purple-600 focus:outline-none font-medium"
+                />
               </div>
+
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
-                <input type="email" required name="email" value={formData.email} onChange={handleChange} placeholder="sarah@system.com" className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-purple-600 focus:outline-none font-medium" />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Work Email Address *</label>
+                <input
+                  type="email"
+                  required
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="sarah@system.com"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-purple-600 focus:outline-none font-medium"
+                />
               </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Mobile / Phone Number *</label>
+                <input
+                  type="text"
+                  required
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="e.g. +1 555-0102"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-purple-600 focus:outline-none font-medium"
+                />
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Role</label>
-                  <select name="role" value={formData.role} onChange={handleChange} className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-purple-600 focus:outline-none font-medium">
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Role *</label>
+                  <select
+                    name="role"
+                    value={formData.role}
+                    onChange={handleChange}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-purple-600 focus:outline-none font-medium"
+                  >
                     <option value="EMPLOYEE">EMPLOYEE</option>
                     <option value="RECEPTIONIST">RECEPTIONIST</option>
                     <option value="ADMIN">ADMIN</option>
@@ -180,12 +266,46 @@ export default function ManageEmployees() {
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">Department</label>
-                  <input type="text" name="department" value={formData.department} onChange={handleChange} placeholder="HR / Tech" className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-purple-600 focus:outline-none font-medium" />
+                  <input
+                    type="text"
+                    name="department"
+                    value={formData.department}
+                    onChange={handleChange}
+                    placeholder="Engineering / HR"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-purple-600 focus:outline-none font-medium"
+                  />
                 </div>
               </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  {editingUser ? 'New Password (Leave blank to keep current)' : 'Password *'}
+                </label>
+                <input
+                  type="password"
+                  required={!editingUser}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder={editingUser ? '••••••••' : 'password123'}
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-purple-600 focus:outline-none font-medium"
+                />
+              </div>
+
               <div className="flex justify-end gap-2 pt-2">
-                <button type="button" onClick={() => setModalOpen(false)} className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-xs font-bold hover:bg-slate-200">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow-md">Save User Account</button>
+                <button
+                  type="button"
+                  onClick={() => setModalOpen(false)}
+                  className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-xs font-bold hover:bg-slate-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow-md"
+                >
+                  {editingUser ? 'Update Staff Account' : 'Save User Account'}
+                </button>
               </div>
             </form>
           </div>
