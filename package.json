@@ -1,0 +1,17 @@
+{
+  "name": "visitor-pass-management-system",
+  "version": "1.0.0",
+  "description": "MERN Stack Visitor Pass Management System with Role-Based Access Control & Business Rules",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "server": "npm run dev --prefix server",
+    "client": "npm run dev --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "build": "npm run build --prefix client",
+    "seed": "npm run seed --prefix server"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
