@@ -27,7 +27,7 @@ export default function VisitorLog() {
   const [checkInModalVisit, setCheckInModalVisit] = useState(null);
   const [error, setError] = useState('');
   const [toast, setToast] = useState(null);
-  const [confirmModal, setConfirmModal] = useState(null); // { title, message, actionType, targetId }
+  const [confirmModal, setConfirmModal] = useState(null);
 
   const fetchVisits = async () => {
     try {
@@ -210,14 +210,15 @@ export default function VisitorLog() {
                   <tr key={v._id} className="hover:bg-slate-50 transition">
                     <td className="p-3 sm:p-4">
                       <div className="font-bold text-slate-900">{v.visitor?.fullName}</div>
-                      <div className="text-xs text-slate-500">{v.visitor?.email} • {v.visitor?.phone}</div>
+                      <div className="text-xs text-slate-500 font-medium">{v.visitor?.email}</div>
+                      <div className="text-xs text-slate-500 font-mono mt-0.5">{v.visitor?.phone}</div>
                       <div className="text-[11px] text-slate-400 italic mt-0.5">{v.visitor?.company}</div>
                     </td>
 
                     <td className="p-3 sm:p-4 text-slate-800 font-medium max-w-xs">
-                      <div className="bg-blue-50/70 border border-blue-100 rounded-xl p-2.5 text-xs leading-relaxed text-blue-900 font-semibold">
+                      <span className="inline-block bg-slate-100 border border-slate-200/80 text-slate-800 text-xs px-3 py-1.5 rounded-full font-medium shadow-2xs">
                         {v.purpose || 'N/A'}
-                      </div>
+                      </span>
                     </td>
 
                     <td className="p-3 sm:p-4">
@@ -234,8 +235,10 @@ export default function VisitorLog() {
                       <div className="text-slate-800 font-semibold">{new Date(v.visitDate).toLocaleDateString('en-IN')}</div>
                       <div className="text-slate-500">{v.expectedTime}</div>
                       {v.badgeNumber && (
-                        <div className="mt-1 inline-block px-2 py-0.5 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 font-bold text-[11px]">
-                          Badge #{v.badgeNumber}
+                        <div className="mt-1.5">
+                          <span className="inline-block bg-slate-100 border border-slate-200/80 text-slate-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-2xs">
+                            Badge #{v.badgeNumber}
+                          </span>
                         </div>
                       )}
                     </td>
