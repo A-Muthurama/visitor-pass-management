@@ -1,7 +1,7 @@
 // client/src/components/Navbar.jsx
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, Menu, X } from 'lucide-react';
+import { LogOut, Menu, X, Shield } from 'lucide-react';
 import { Link, useNavigate, NavLink } from 'react-router-dom';
 
 export default function Navbar() {
@@ -42,8 +42,8 @@ export default function Navbar() {
     <header className="sticky top-0 z-40 bg-white border-b border-slate-200 px-4 sm:px-6 py-3 flex flex-col sm:flex-row sm:items-center justify-between shadow-xs">
       <div className="flex items-center justify-between">
         <Link to="/dashboard" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-blue-600 p-2 flex items-center justify-center shadow-md shadow-blue-600/20 group-hover:bg-blue-700 transition-colors">
-            <img src="/visitor.png" alt="PassGuard" className="w-full h-full object-contain brightness-0 invert" />
+          <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-600/20 group-hover:bg-blue-700 transition-colors">
+            <Shield className="w-5 h-5 text-white" />
           </div>
           <div>
             <h1 className="font-bold text-lg text-slate-900 tracking-tight flex items-center gap-2">
