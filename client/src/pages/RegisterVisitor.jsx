@@ -99,7 +99,7 @@ export default function RegisterVisitor() {
           Register New Visitor Request
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-          Indian Office Entry Standard — Fill visitor details & host schedule below.
+          Office Entry Standard — Fill visitor details & host schedule below.
         </p>
       </div>
 

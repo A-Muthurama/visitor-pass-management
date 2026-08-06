@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import API from '../services/api';
 import ActivityTimelineModal from '../components/ActivityTimelineModal';
+import ToastModal from '../components/ToastModal';
 import { 
   CheckSquare, 
   CheckCircle, 
@@ -19,6 +20,7 @@ export default function EmployeeRequests() {
   const [remarks, setRemarks] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [toast, setToast] = useState(null);
 
   const fetchRequests = async () => {
     try {
@@ -41,16 +43,32 @@ export default function EmployeeRequests() {
     setError('');
     setSubmitting(true);
 
+    const isApprove = actionModal.action === 'APPROVED';
+    const visitorName = actionModal.visit.visitor?.fullName || 'Visitor';
+
     try {
       await API.put(`/visits/${actionModal.visit._id}/status`, {
         status: actionModal.action,
-        remarks: remarks || (actionModal.action === 'APPROVED' ? 'Approved by host' : 'Rejected by host'),
+        remarks: remarks || (isApprove ? 'Approved by host' : 'Rejected by host'),
       });
       setActionModal(null);
       setRemarks('');
       await fetchRequests();
+
+      setToast({
+        type: isApprove ? 'success' : 'error',
+        title: isApprove ? 'Visitor Request Approved' : 'Visitor Request Rejected',
+        message: `Successfully ${isApprove ? 'approved' : 'rejected'} visit request for ${visitorName}. Audit log recorded.`,
+      });
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update request status');
+      const rawMsg = err.response?.data?.message || 'Failed to update request status';
+      const cleanMsg = rawMsg.replace(/^Rule \d+ Violation:\s*/i, '');
+      setError(cleanMsg);
+      setToast({
+        type: 'error',
+        title: 'Action Failed',
+        message: cleanMsg,
+      });
     } finally {
       setSubmitting(false);
     }
@@ -79,7 +97,7 @@ export default function EmployeeRequests() {
           My Visitor Approvals & Requests
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-          Review visitor requests assigned to you. Enforces Rule 5 (Max 3 pending requests).
+          Review visitor requests assigned to you. Enforces Max 3 pending requests.
         </p>
       </div>
 
@@ -154,7 +172,7 @@ export default function EmployeeRequests() {
         )}
       </div>
 
-      {/* Enhanced Approval / Rejection Action Modal with Animated Spinner */}
+      {/* Enhanced Approval / Rejection Action Modal */}
       {actionModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-200">
           <div className="bg-white w-full max-w-md rounded-2xl p-6 relative border border-slate-200 shadow-2xl transition-all scale-100">
@@ -231,6 +249,9 @@ export default function EmployeeRequests() {
           onClose={() => setSelectedVisitId(null)}
         />
       )}
+
+      {/* Global Center-Screen Toast Modal */}
+      <ToastModal toast={toast} onClose={() => setToast(null)} />
     </div>
   );
 }

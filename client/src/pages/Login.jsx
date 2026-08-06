@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Shield, KeyRound, Mail, ArrowRight, AlertCircle, Eye, EyeOff, UserCheck, Users } from 'lucide-react';
+import { Shield, KeyRound, Mail, ArrowRight, AlertCircle, Eye, EyeOff, UserCheck, Users, Info } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -20,10 +20,25 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await login(email, password);
+      const res = await login(email, password);
+      
+      // Role enforcement check for login portal tabs
+      const userRole = res?.role || JSON.parse(localStorage.getItem('user'))?.role;
+      if (activeTab === 'ADMIN' && userRole !== 'ADMIN') {
+        setError('Access Denied: Admin Portal is strictly reserved for System Administrators. Please switch to the Staff Portal tab.');
+        setLoading(false);
+        return;
+      }
+      
+      if (activeTab === 'STAFF' && userRole === 'ADMIN') {
+        setError('Access Notice: You are logged in as System Administrator. Please switch to the Admin Portal tab.');
+        setLoading(false);
+        return;
+      }
+
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid email or password');
+      setError(err.response?.data?.message || 'Invalid credentials or password');
     } finally {
       setLoading(false);
     }
@@ -81,8 +96,18 @@ export default function Login() {
             </button>
           </div>
 
+          {/* Role Portal Helper Guidance */}
+          <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs font-medium text-slate-600 flex items-start gap-2">
+            <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+            <span>
+              {activeTab === 'ADMIN' 
+                ? 'Admin Portal: Exclusively for System Administrators.' 
+                : 'Staff Portal: For Employees and Receptionists using credentials assigned by System Admin.'}
+            </span>
+          </div>
+
           {error && (
-            <div className="flex items-center gap-2 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold">
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold animate-in fade-in">
               <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-600" />
               <span>{error}</span>
             </div>

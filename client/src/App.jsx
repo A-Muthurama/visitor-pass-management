@@ -32,11 +32,11 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-100 text-slate-900">
+    <div className="h-screen flex flex-col bg-slate-100 text-slate-900 overflow-hidden">
       <Navbar />
-      <div className="flex flex-1">
+      <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full overflow-y-auto bg-slate-100">
+        <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full overflow-y-auto bg-slate-100 relative">
           {children}
         </main>
       </div>

@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import API from '../services/api';
 import ActivityTimelineModal from '../components/ActivityTimelineModal';
+import ToastModal from '../components/ToastModal';
+import ConfirmModal from '../components/ConfirmModal';
 import { 
   Search, 
   Filter, 
@@ -24,6 +26,8 @@ export default function VisitorLog() {
   const [badgeInput, setBadgeInput] = useState('');
   const [checkInModalVisit, setCheckInModalVisit] = useState(null);
   const [error, setError] = useState('');
+  const [toast, setToast] = useState(null);
+  const [confirmModal, setConfirmModal] = useState(null); // { title, message, actionType, targetId }
 
   const fetchVisits = async () => {
     try {
@@ -53,6 +57,11 @@ export default function VisitorLog() {
       setCheckInModalVisit(null);
       setBadgeInput('');
       await fetchVisits();
+      setToast({
+        type: 'success',
+        title: 'Visitor Checked In',
+        message: 'Visitor pass assigned and check-in logged successfully!',
+      });
     } catch (err) {
       const rawMsg = err.response?.data?.message || 'Check-in failed';
       const cleanMsg = rawMsg.replace(/^Rule \d+ Violation:\s*/i, '');
@@ -62,24 +71,59 @@ export default function VisitorLog() {
     }
   };
 
-  const handleCheckOut = async (visitId) => {
-    if (!window.confirm('Are you sure you want to check out this visitor?')) return;
-    try {
-      await API.put(`/visits/${visitId}/checkout`);
-      fetchVisits();
-    } catch (err) {
-      const rawMsg = err.response?.data?.message || 'Check-out failed';
-      alert(rawMsg.replace(/^Rule \d+ Violation:\s*/i, ''));
-    }
+  const triggerCheckOut = (visit) => {
+    setConfirmModal({
+      title: 'Confirm Visitor Check-Out',
+      message: `Are you sure you want to check out ${visit.visitor?.fullName}?`,
+      confirmText: 'Check Out Visitor',
+      confirmVariant: 'slate',
+      actionType: 'CHECK_OUT',
+      targetId: visit._id,
+    });
   };
 
-  const handleDeleteVisit = async (visitId) => {
-    if (!window.confirm('Are you sure you want to permanently delete this visitor pass record?')) return;
+  const triggerDeleteVisit = (visit) => {
+    setConfirmModal({
+      title: 'Permanently Delete Visitor Record?',
+      message: `Are you sure you want to permanently delete the visitor pass record for ${visit.visitor?.fullName}? This action cannot be undone.`,
+      confirmText: 'Delete Record',
+      confirmVariant: 'danger',
+      actionType: 'DELETE',
+      targetId: visit._id,
+    });
+  };
+
+  const handleConfirmAction = async () => {
+    if (!confirmModal) return;
+    setSubmitting(true);
+
     try {
-      await API.delete(`/visits/${visitId}`);
-      fetchVisits();
+      if (confirmModal.actionType === 'CHECK_OUT') {
+        await API.put(`/visits/${confirmModal.targetId}/checkout`);
+        setToast({
+          type: 'info',
+          title: 'Visitor Checked Out',
+          message: 'Visitor check-out timestamp recorded.',
+        });
+      } else if (confirmModal.actionType === 'DELETE') {
+        await API.delete(`/visits/${confirmModal.targetId}`);
+        setToast({
+          type: 'error',
+          title: 'Record Deleted',
+          message: 'Visitor pass record permanently deleted.',
+        });
+      }
+      setConfirmModal(null);
+      await fetchVisits();
     } catch (err) {
-      alert(err.response?.data?.message || 'Delete failed');
+      const rawMsg = err.response?.data?.message || 'Operation failed';
+      setToast({
+        type: 'error',
+        title: 'Action Failed',
+        message: rawMsg.replace(/^Rule \d+ Violation:\s*/i, ''),
+      });
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -153,6 +197,7 @@ export default function VisitorLog() {
               <thead className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
                 <tr>
                   <th className="p-3 sm:p-4">Visitor Details</th>
+                  <th className="p-3 sm:p-4">Purpose of Visit</th>
                   <th className="p-3 sm:p-4">Host Employee</th>
                   <th className="p-3 sm:p-4">ID Proof</th>
                   <th className="p-3 sm:p-4">Schedule / Badge</th>
@@ -167,6 +212,12 @@ export default function VisitorLog() {
                       <div className="font-bold text-slate-900">{v.visitor?.fullName}</div>
                       <div className="text-xs text-slate-500">{v.visitor?.email} • {v.visitor?.phone}</div>
                       <div className="text-[11px] text-slate-400 italic mt-0.5">{v.visitor?.company}</div>
+                    </td>
+
+                    <td className="p-3 sm:p-4 text-slate-800 font-medium max-w-xs">
+                      <div className="bg-blue-50/70 border border-blue-100 rounded-xl p-2.5 text-xs leading-relaxed text-blue-900 font-semibold">
+                        {v.purpose || 'N/A'}
+                      </div>
                     </td>
 
                     <td className="p-3 sm:p-4">
@@ -207,7 +258,7 @@ export default function VisitorLog() {
 
                       {v.status === 'CHECKED_IN' && (
                         <button
-                          onClick={() => handleCheckOut(v._id)}
+                          onClick={() => triggerCheckOut(v)}
                           className="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition border bg-slate-800 text-white hover:bg-slate-900 inline-flex items-center gap-1 shadow-xs"
                         >
                           <LogOut className="w-3.5 h-3.5" /> Check Out
@@ -222,7 +273,7 @@ export default function VisitorLog() {
                       </button>
 
                       <button
-                        onClick={() => handleDeleteVisit(v._id)}
+                        onClick={() => triggerDeleteVisit(v)}
                         className="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition border bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100 inline-flex items-center gap-1"
                       >
                         <Trash2 className="w-3.5 h-3.5 text-rose-600" /> Delete
@@ -236,7 +287,7 @@ export default function VisitorLog() {
         )}
       </div>
 
-      {/* Enhanced Check-In Modal with Inline Clean Error Display & Animated Loading */}
+      {/* Enhanced Check-In Modal */}
       {checkInModalVisit && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-200">
           <div className="bg-white w-full max-w-md rounded-2xl p-6 relative border border-slate-200 shadow-2xl">
@@ -307,6 +358,15 @@ export default function VisitorLog() {
           onClose={() => setSelectedVisitId(null)}
         />
       )}
+
+      <ToastModal toast={toast} onClose={() => setToast(null)} />
+      
+      <ConfirmModal
+        confirm={confirmModal}
+        loading={submitting}
+        onClose={() => setConfirmModal(null)}
+        onConfirm={handleConfirmAction}
+      />
     </div>
   );
 }

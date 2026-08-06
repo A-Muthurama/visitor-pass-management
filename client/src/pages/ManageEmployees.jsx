@@ -1,15 +1,20 @@
 // client/src/pages/ManageEmployees.jsx
 import React, { useEffect, useState } from 'react';
 import API from '../services/api';
-import { Users, Plus, X, Edit2, Trash2, Phone, Mail, Building, UserCheck, Eye, EyeOff } from 'lucide-react';
+import ToastModal from '../components/ToastModal';
+import ConfirmModal from '../components/ConfirmModal';
+import { Users, Plus, X, Edit2, Trash2, Phone, Mail, Building, UserCheck, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 export default function ManageEmployees() {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [toast, setToast] = useState(null);
+  const [confirmModal, setConfirmModal] = useState(null); // { title, message, targetUser }
 
   const [formData, setFormData] = useState({
     name: '',
@@ -73,27 +78,63 @@ export default function ManageEmployees() {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSubmitting(true);
 
     try {
       if (editingUser) {
         await API.put(`/users/${editingUser._id}`, formData);
+        setToast({
+          type: 'success',
+          title: 'Account Updated',
+          message: `Staff user account for ${formData.name} updated successfully.`,
+        });
       } else {
         await API.post('/users', formData);
+        setToast({
+          type: 'success',
+          title: 'Account Created',
+          message: `New staff user account for ${formData.name} created successfully.`,
+        });
       }
       setModalOpen(false);
-      fetchEmployees();
+      await fetchEmployees();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to save user account');
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  const handleDeleteUser = async (user) => {
-    if (!window.confirm(`Are you sure you want to permanently delete staff user account '${user.name}'?`)) return;
+  const triggerDeleteUser = (user) => {
+    setConfirmModal({
+      title: 'Permanently Delete Staff Account?',
+      message: `Are you sure you want to delete staff account '${user.name}' (${user.email})? This action cannot be undone.`,
+      confirmText: 'Delete Staff User',
+      confirmVariant: 'danger',
+      targetUser: user,
+    });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!confirmModal) return;
+    setSubmitting(true);
     try {
-      await API.delete(`/users/${user._id}`);
-      fetchEmployees();
+      await API.delete(`/users/${confirmModal.targetUser._id}`);
+      setToast({
+        type: 'error',
+        title: 'Account Deleted',
+        message: `Staff user account '${confirmModal.targetUser.name}' permanently deleted.`,
+      });
+      setConfirmModal(null);
+      await fetchEmployees();
     } catch (err) {
-      alert(err.response?.data?.message || 'Delete failed');
+      setToast({
+        type: 'error',
+        title: 'Delete Failed',
+        message: err.response?.data?.message || 'Failed to delete user account',
+      });
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -117,7 +158,10 @@ export default function ManageEmployees() {
 
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         {loading ? (
-          <div className="py-12 text-center text-slate-500 font-medium">Loading user accounts...</div>
+          <div className="py-12 flex flex-col items-center justify-center gap-3 text-slate-500 font-medium">
+            <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
+            <span>Loading user accounts...</span>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs sm:text-sm">
@@ -181,7 +225,7 @@ export default function ManageEmployees() {
                       </button>
 
                       <button
-                        onClick={() => handleDeleteUser(emp)}
+                        onClick={() => triggerDeleteUser(emp)}
                         className="px-2.5 py-1.5 rounded-lg text-xs font-bold transition border bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100 inline-flex items-center gap-1"
                       >
                         <Trash2 className="w-3.5 h-3.5 text-rose-600" /> Delete
@@ -236,7 +280,7 @@ export default function ManageEmployees() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Mobile Number (Indian Office Standard) *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Mobile Number (Indian Standard) *</label>
                 <input
                   type="text"
                   required
@@ -302,22 +346,40 @@ export default function ManageEmployees() {
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
+                  disabled={submitting}
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-xs font-bold hover:bg-slate-200"
+                  className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-xs font-bold hover:bg-slate-200 disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow-md"
+                  disabled={submitting}
+                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow-md flex items-center gap-2 disabled:opacity-50"
                 >
-                  {editingUser ? 'Update Staff Account' : 'Save User Account'}
+                  {submitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Saving Account...</span>
+                    </>
+                  ) : (
+                    <span>{editingUser ? 'Update Staff Account' : 'Save User Account'}</span>
+                  )}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
+      <ToastModal toast={toast} onClose={() => setToast(null)} />
+
+      <ConfirmModal
+        confirm={confirmModal}
+        loading={submitting}
+        onClose={() => setConfirmModal(null)}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 }
